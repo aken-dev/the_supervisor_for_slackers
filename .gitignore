@@ -1,0 +1,8 @@
+.env
+*.log
+/__pycache__
+/common/__pycache__
+/controller/__pycache__
+/entity/__pycache__
+/repository/__pycache__
+/service/__pycache__
