@@ -23,7 +23,10 @@ def get_authentication(operating_mode, line_user_id, line_name, postback_data=No
         if postback_data['action'] == 'display' and postback_data['type'] == 'agreement':
             return userInfo, tou_sv.get_terms_of_use_with_agreement_buttons()
         elif postback_data['action'] == 'agreement' and postback_data['value'] == 'agree':
-            new_user_flag = True if userInfo.allowed == co.USER_UNREGISTERED else new_user_flag = False
+            if userInfo.allowed == co.USER_UNREGISTERED:
+                new_user_flag = True 
+            else:
+                new_user_flag = False
             userInfo = ui_sv.change_user_allowed(userInfo, co.USER_ALLOWED)
             print('規約同意：{} : {}'.format(line_user_id, line_name))
             return userInfo, ui_sv.display_user_info(userInfo, new_user_flag)
