@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import datetime
 import sys
+import json
 import traceback
 import re
 import common.constant as co
@@ -63,34 +64,76 @@ def display_user_info(userInfo, new_user_flag=False):
     msg_instances = []
     if new_user_flag == True:
         msg_instances.append(lt_sv.get_a_text_send_message(
-            '君は怠惰で有名な{}だろ！？\n待ってたぞ。まずは質より量だ。はやく取り掛れ！' \
-                           .format(userInfo.line_name)
+            '君は怠惰で有名な{}だろ！？\n待ってたぞ。\nまずは質より量だ。はやく作業に取り掛るんだ！'
+            .format(userInfo.line_name)
         ))
         msg_instances.append(lt_sv.get_a_text_send_message(
             '初期の設定内容だ。必要に応じて変更してくれ。' 
         ))
     msg_instances.append(get_user_info_setting(userInfo))
+    msg_instances.append(get_txt_with_quick_reply_btns_for_user_info(userInfo))
     return msg_instances
     
 def get_user_info_setting(userInfo):
-    return lt_sv.get_a_text_send_message( \
-    '【現在の設定内容】\n\n' \
-    + '[現在の課題番号]\n   #{}\n\n'.format(userInfo.current_stage) \
-    + '[直近の課題番号変更日]\n   {}（{}）\n\n'.format( \
-        userInfo.recent_stage_changed_date if userInfo.recent_stage_changed_date != None else \
-        '履歴なし', co.WEEKDAY[userInfo.recent_stage_changed_date.weekday()] if userInfo.recent_stage_changed_date != None else \
-        '履歴なし') \
-    + '[次の課題番号への変更]\n   {}\n\n'.format( \
-          ('リマインドしない' if userInfo.stage_change_remind_type == co.STAGE_CHANGE_REMIND_TYPE_NOTHING else  \
-            ('（毎週）{}にリマインド'.format(co.WEEKDAY[userInfo.stage_change_remind_value]) if  \
-               userInfo.stage_change_remind_type == co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK  \
-               and userInfo.stage_change_remind_value <= 6 else \
-               ('番号変更の{}日後にリマインド'.format(userInfo.stage_change_remind_value)) \
-            ) \
-          ) \
-       ) \
-    + '[作業目標時間（1日あたり）]\n   {}時間\n\n'.format(userInfo.required_working_hours) \
-    + '[1日のはじまりは何時？]\n   {}時\n\n'.format(userInfo.starting_time_of_a_day) \
-    + '[最後の課題番号]\n   #{}\n\n'.format(userInfo.the_last_stage) \
+    return lt_sv.get_a_text_send_message(
+        '【現在の設定内容】\n\n'
+        + '[現在の課題番号]\n   #{}\n\n'.format(userInfo.current_stage)
+        + '[直近の課題番号変更日]\n   {}（{}）\n\n'.format(
+            (
+                userInfo.recent_stage_changed_date if 
+                userInfo.recent_stage_changed_date != None else '履歴なし'
+            ), 
+            (
+                co.WEEKDAY[userInfo.recent_stage_changed_date.weekday()] if
+                userInfo.recent_stage_changed_date != None else '履歴なし'
+            )
+        )
+        + '[次の課題番号への変更]\n   {}\n\n'.format(
+            'リマインドしない' if userInfo.stage_change_remind_type == co.STAGE_CHANGE_REMIND_TYPE_NOTHING else (
+                '（毎週）{}にリマインド'.format(co.WEEKDAY[userInfo.stage_change_remind_value]) if 
+                userInfo.stage_change_remind_type == co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK 
+                and userInfo.stage_change_remind_value <= 6 else (
+                    '番号変更の{}日後にリマインド'.format(userInfo.stage_change_remind_value) if 
+                    userInfo.stage_change_remind_type == co.STAGE_CHANGE_REMIND_TYPE_DAYS else 'リマインド間隔が未設定'
+                )
+            )
+        )
+        + '[作業目標時間（1日あたり）]\n   {}時間\n\n'.format(userInfo.required_working_hours)
+        + '[1日のはじまりは何時？]\n   {}時\n\n'.format(userInfo.starting_time_of_a_day)
+        + '[最後の課題番号]\n   #{}\n\n'.format(userInfo.the_last_stage)
     )
     
+def get_txt_with_quick_reply_btns_for_user_info(userInfo):
+    return lt_sv.get_a_text_send_message_includes_quick_reply_buttons(
+        '設定変更は下記のボタンから頼む。',
+        [
+            lt_sv.get_quick_reply_button_for_postback(
+                '現在の課題番号を変更', 
+                '現在の課題番号を変更', 
+                json.dumps({
+                    "action": "display",
+                    "type": "choices",
+                    "target": "current_stage",
+                    "min": 1,
+                    "max": userInfo.the_last_stage,
+                    "current": userInfo.current_stage
+                })
+            ),
+            lt_sv.get_quick_reply_button_for_postback_datetime( 
+                '直近の課題番号変更日を変更', 
+                json.dumps({
+                    "action": "update",
+                    "type": "choices",
+                    "target": "recent_stage_changed_date",
+                    "min": 1,
+                    "max": userInfo.the_last_stage,
+                    "current": userInfo.current_stage
+                }),
+                'date',
+                userInfo.recent_stage_changed_date.strftime("%Y-%m-%d") if 
+                userInfo.recent_stage_changed_date != None else '',
+                datetime.datetime.now().strftime("%Y-%m-%d")
+            )
+        ]
+    )
+        

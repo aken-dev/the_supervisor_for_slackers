@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import json
+import datetime
 from linebot.models import PostbackAction, QuickReplyButton, MessageAction, QuickReply, TextSendMessage
 
 #シンプルなテキストメッセージを作成
@@ -38,3 +40,15 @@ def get_quick_reply_button_for_postback_datetime(lavel_text, data, mode='datetim
   "max": f"{max}", #最大値
   "min": f"{min}" #最小値
 })#日時はdatetime.strftime("%Y-%m-%dt%H:%M")で指定
+
+#Postbackで受け取ったjsonを辞書型で返却
+def get_postbacked_data(event):
+    data = json.loads(event.postback.data)
+    if ('params' in str(event.postback)):
+        if('date' in event.postback.params):
+            data['date'] = datetime.datetime.strptime(event.postback.params['date'], '%Y-%m-%d').date()
+        elif('time' in event.postback.params):
+            data['time'] = datetime.datetime.strptime('20200101{}'.format(event.postback.params['time']), '%H:%M').time()
+        elif('datetime' in event.postback.params):
+            data['datetime'] = datetime.datetime.strptime(event.postback.params['datetime'], '%Y-%m-%dT%H:%M')
+    return data

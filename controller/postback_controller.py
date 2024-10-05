@@ -5,7 +5,10 @@ import service.authenticate_service as au_sv
 import service.reply_to_postbacked_message_service as rp_sv
 import service.line_tool_service as lt_sv
 def action(event, line_name):
-    data = json.loads(event.postback.data)
+    # print(event.postback.params['date'] if event.postback.params['date'] != None else 'noneだった')
+    # print(event)
+    data = lt_sv.get_postbacked_data(event)
+    print(data)
     operating_mode = int(os.getenv('SV_SLACKERS_APP_OPERATING_MODE', None))
     userInfo, authenticate_msg_instance = au_sv.get_authentication(
         operating_mode, event.source.user_id, line_name, data
