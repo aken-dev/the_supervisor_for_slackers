@@ -114,25 +114,107 @@ def get_txt_with_quick_reply_btns_for_user_info(userInfo):
                     "action": "display",
                     "type": "choices",
                     "target": "current_stage",
+                    "tmp_value": userInfo.current_stage,
                     "min": 1,
                     "max": userInfo.the_last_stage,
-                    "current": userInfo.current_stage
+                    "current_value": userInfo.current_stage
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback_datetime( 
-                '直近の課題番号変更日を変更', 
+                '直近の番号変更日を修正', 
                 json.dumps({
                     "action": "update",
-                    "type": "choices",
+                    "type": "user_info",
                     "target": "recent_stage_changed_date",
-                    "min": 1,
-                    "max": userInfo.the_last_stage,
-                    "current": userInfo.current_stage
+                    "new_value": "date",
+                    "current_value": userInfo.recent_stage_changed_date.strftime("%Y-%m-%d") if 
+                    userInfo.recent_stage_changed_date != None else '',
                 }),
                 'date',
                 userInfo.recent_stage_changed_date.strftime("%Y-%m-%d") if 
                 userInfo.recent_stage_changed_date != None else '',
                 datetime.datetime.now().strftime("%Y-%m-%d")
+            ),
+            lt_sv.get_quick_reply_button_for_postback(
+                '曜日でリマインドを設定', 
+                '曜日でリマインドを設定', 
+                json.dumps({
+                    "action": "update",
+                    "type": "user_info",
+                    "target": "stage_change_remind_type",
+                    "new_value": co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK,
+                    "current_value": userInfo.stage_change_remind_type
+                })
+            ),
+            lt_sv.get_quick_reply_button_for_postback(
+                '日数間隔でリマインドを設定', 
+                '日数間隔でリマインドを設定', 
+                json.dumps({
+                    "action": "update",
+                    "type": "user_info",
+                    "target": "stage_change_remind_type",
+                    "new_value": co.STAGE_CHANGE_REMIND_TYPE_DAYS,
+                    "current_value": userInfo.stage_change_remind_type
+                })
+            ),
+            lt_sv.get_quick_reply_button_for_postback(
+                'リマインド設定を解除', 
+                'リマインド設定を解除', 
+                json.dumps({
+                    "action": "update",
+                    "type": "user_info",
+                    "target": "stage_change_remind_type",
+                    "new_value": co.STAGE_CHANGE_REMIND_TYPE_NOTHING,
+                    "current_value": userInfo.stage_change_remind_type
+                })
+            ),
+            lt_sv.get_quick_reply_button_for_postback(
+                '目標作業時間（1日あたり）を変更', 
+                '目標作業時間（1日あたり）を変更', 
+                json.dumps({
+                    "action": "display",
+                    "type": "choices",
+                    "target": "required_working_hours",
+                    "tmp_value": userInfo.required_working_hours,
+                    "min": 1,
+                    "max": 24,
+                    "current_value": userInfo.required_working_hours
+                })
+            ),
+            lt_sv.get_quick_reply_button_for_postback(
+                '1日のはじまりの時刻を変更', 
+                '1日のはじまりの時刻を変更', 
+                json.dumps({
+                    "action": "display",
+                    "type": "choices",
+                    "target": "starting_time_of_a_day",
+                    "tmp_value": userInfo.starting_time_of_a_day,
+                    "min": 0,
+                    "max": 23,
+                    "current_value": userInfo.starting_time_of_a_day
+                })
+            ),
+            lt_sv.get_quick_reply_button_for_postback(
+                '最大の課題番号を変更', 
+                '最大の課題番号を変更', 
+                json.dumps({
+                    "action": "display",
+                    "type": "choices",
+                    "target": "the_last_stage",
+                    "tmp_value": userInfo.the_last_stage,
+                    "min": 1,
+                    "max": 100,
+                    "current_value": userInfo.the_last_stage
+                })
+            ),
+            lt_sv.get_quick_reply_button_for_postback(
+                '利用規約を表示', 
+                '利用規約を表示', 
+                json.dumps({
+                    "action": "display",
+                    "type": "display",
+                    "target": "terms_of_use"
+                })
             )
         ]
     )

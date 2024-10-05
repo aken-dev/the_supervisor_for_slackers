@@ -39,7 +39,7 @@ def get_authentication(operating_mode, line_user_id, line_name, postback_data=No
             return userInfo, lt_sv.get_a_text_send_message('利用を許可されていません。')
         elif userInfo.allowed == co.USER_UNREGISTERED:
             print('未登録ユーザのアクセス : {} : {}'.format(line_user_id, line_name))
-            return userInfo, lt_sv.get_a_text_send_message('利用を許可されていません。')        
+            return userInfo, lt_sv.get_a_text_send_message('登録を許可されていません。')        
     elif operating_mode == co.OPERATING_MODE_APPROVE_ALL_USERS_EXCEPT_BANNED_USERS:
         if userInfo.allowed == co.USER_UNALLOWED:
             print('未許可ユーザのアクセス : {} : {}'.format(line_user_id, line_name))
