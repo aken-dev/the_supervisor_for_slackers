@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import json
-import line_tool_service as lt_sv
+import service.shared.line_tool_service as lt_sv
 import repository.terms_of_use_repository as tu_rp
 
 def get_terms_of_use():
