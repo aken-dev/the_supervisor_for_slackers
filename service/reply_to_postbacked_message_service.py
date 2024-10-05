@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import service.authenticate_service as au_sv
-import service.line_tool_service as lt_sv
+import service.shared.authenticate_service as au_sv
+import service.shared.line_tool_service as lt_sv
 def reply_to_message_postbacked(operating_mode, event, line_name):
     postbacked_data = lt_sv.get_postbacked_data(event)
     userInfo, authenticate_msg_instance = au_sv.get_authentication(

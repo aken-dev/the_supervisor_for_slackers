@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import json
 import common.constant as co
-import service.line_tool_service as lt_sv
-import service.terms_of_use_service as tou_sv
-import service.user_info_service as ui_sv
+import line_tool_service as lt_sv
+import terms_of_use_service as tou_sv
+import user_info_service as ui_sv
 
 # Authentication
 def get_authentication(operating_mode, line_user_id, line_name, postback_data=None):

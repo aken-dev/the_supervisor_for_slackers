@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import common.constant as co
-import service.authenticate_service as au_sv
-import service.line_tool_service as lt_sv
+import service.shared.authenticate_service as au_sv
+import service.shared.line_tool_service as lt_sv
 
 def get_a_reply_to_new_follower(operating_mode, event, line_name):
     userInfo, replyInstance = au_sv.get_authentication(operating_mode, event.source.user_id, line_name)
