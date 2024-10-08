@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os
-import service.authenticate_service as au_sv
+import service.authenticate_service as authenticate_sv
 import service.shared.line_tool_service as lt_sv
 import controller.postback_display_controller as postback_display_cr
 import controller.postback_update_controller as postback_update_cr
@@ -8,7 +8,7 @@ import controller.postback_update_controller as postback_update_cr
 def action(event, line_name):
     operating_mode = int(os.getenv('SV_SLACKERS_APP_OPERATING_MODE', None))
     data = lt_sv.get_postbacked_data(event)
-    userInfo, authenticate_msg_instance = au_sv.get_authentication(
+    userInfo, authenticate_msg_instance = authenticate_sv.main(
         operating_mode, event.source.user_id, line_name, data
     )
     if authenticate_msg_instance != None:

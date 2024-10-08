@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os
-import service.authenticate_service as au_sv
+import service.authenticate_service as authenticate_sv
 import service.shared.line_tool_service as lt_sv
 import service.reply_to_text_start_working_service as reply_to_text_start_working_sv
 import service.reply_to_text_finish_working_service as reply_to_text_finish_working_sv
@@ -11,7 +11,7 @@ import service.reply_to_text_setting_service as reply_to_text_setting_sv
 
 def action(event, line_name):
     operating_mode = int(os.getenv('SV_SLACKERS_APP_OPERATING_MODE', None))
-    userInfo, authenticate_msg_instance = au_sv.get_authentication(
+    userInfo, authenticate_msg_instance = authenticate_sv.main(
         operating_mode, event.source.user_id, line_name
     )
     if authenticate_msg_instance != None:

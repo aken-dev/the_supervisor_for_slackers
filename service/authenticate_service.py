@@ -6,7 +6,7 @@ import service.shared.terms_of_use_service as tou_sv
 import service.shared.user_info_service as ui_sv
 
 # Authentication
-def get_authentication(operating_mode, line_user_id, line_name, postback_data=None):
+def main(operating_mode, line_user_id, line_name, postback_data=None):
     userInfo = ui_sv.get_user_info(line_user_id, line_name)
     if userInfo == None:
         print('Cannot get UserInfo : {} : {}'.format(line_user_id, line_name))
