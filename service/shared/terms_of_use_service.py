@@ -20,8 +20,7 @@ def get_terms_of_use():
 
 def get_terms_of_use_with_agreement_buttons():
     msg_instances = get_terms_of_use()
-    agreement_buttons = []
-    agreement_buttons.append(
+    agreement_buttons = [
         lt_sv.get_quick_reply_button_for_postback(
             '同意する', \
             '利用規約に同意します。', \
@@ -29,9 +28,7 @@ def get_terms_of_use_with_agreement_buttons():
                 "action": "agreement",
                 "value": "agree"
                 })
-        )
-    )
-    agreement_buttons.append(
+        ),
         lt_sv.get_quick_reply_button_for_postback(
             '同意しない', \
             '利用規約に同意しません。', \
@@ -40,7 +37,7 @@ def get_terms_of_use_with_agreement_buttons():
                 "value": "disagree"
                 })
         )
-    )
+    ]
     msg_instances.append(
         lt_sv.get_a_text_send_message_includes_quick_reply_buttons(
             '利用規約に同意しますか？', agreement_buttons

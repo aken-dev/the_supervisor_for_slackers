@@ -2,7 +2,7 @@
 import common.constant as co
 import service.shared.line_tool_service as lt_sv
 
-def get_a_reply_to_new_follower(userInfo, replyInstance):
+def main(userInfo, replyInstance):
     if replyInstance != None:
         return replyInstance
     elif userInfo.allowed == co.USER_ALLOWED:
