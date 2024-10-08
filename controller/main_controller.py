@@ -5,7 +5,7 @@ from flask import request, abort, Blueprint
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import FollowEvent, PostbackEvent, MessageEvent, TextMessage
-import controller.simple_text_main_controller
+import controller.simple_text_controller
 import controller.postback_main_controller
 import controller.follow_event_controller
 
@@ -42,7 +42,7 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_getting_text_message(event):
     line_name = line_bot_api.get_profile(event.source.user_id).display_name
-    reply_instance = controller.simple_text_main_controller.action(event, line_name)
+    reply_instance = controller.simple_text_controller.action(event, line_name)
     line_bot_api.reply_message(event.reply_token, reply_instance)
 
 # ボタンの入力を受け取るPostbackEvent処理
