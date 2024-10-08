@@ -46,9 +46,11 @@ def get_authentication(operating_mode, line_user_id, line_name, postback_data=No
             return userInfo, tou_sv.get_terms_of_use_with_agreement_buttons()
         elif userInfo.allowed == co.USER_UNREGISTERED:
             agreement_display_button = lt_sv.get_quick_reply_button_for_postback(
-                '利用規約を表示する', '利用規約を表示', json.dumps({
-                "action": "display",
-                "type": "agreement"
+                '利用規約を表示する',
+                '利用規約を表示',
+                json.dumps({
+                    "action": "display",
+                    "type": "agreement"
                 })
             )
             reply_text = '友達追加ありがとうございます。\n' \
