@@ -48,11 +48,11 @@ def change_user_allowed(userInfo, new_allowed):
     else:
         return userInfo
 
-def update_user_info(userInfo, target_column, new_value):
-    eval('userInfo.{} = {}'.format(target_column, new_value))
+def update_user_info(userInfo, target_element_column, new_value):
+    eval('userInfo.{} = {}'.format(target_element_column, new_value))
     userInfo.updated_datetime = datetime.datetime.now(),
     userInfo.updated_by = sys._getframe().f_code.co_name
-    result_count = ui_rp.userinfo_update(userInfo, target_column)
+    result_count = ui_rp.userinfo_update(userInfo, target_element_column)
     if result_count == 0:
         return None
     else:
@@ -111,20 +111,26 @@ def get_user_info_setting_func(userInfo):
                 json.dumps({
                     "action": "display",
                     "type": "choices",
-                    "target": "current_stage",
+                    "target_table": "user_info",
+                    "target_element": "current_stage",
                     "tmp_value": userInfo.current_stage,
                     "min": 1,
                     "max": userInfo.the_last_stage,
-                    "current_value": userInfo.current_stage
+                    "current_value": userInfo.current_stage,
+                    "label": "現在の課題番号",
+                    "unit_before_value": "#",
+                    "unit_after_value": ""
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback_datetime( 
                 '直近の番号変更日を修正', 
                 json.dumps({
                     "action": "update",
-                    "type": "user_info",
-                    "target": "recent_stage_changed_date",
+                    "type": "",
+                    "target_table": "user_info",
+                    "target_element": "recent_stage_changed_date",
                     "new_value": "date",
+                    "label": "直近の番号変更日",
                     "current_value": userInfo.recent_stage_changed_date.strftime("%Y-%m-%d") if 
                     userInfo.recent_stage_changed_date != None else '',
                 }),
@@ -138,10 +144,14 @@ def get_user_info_setting_func(userInfo):
                 '曜日でリマインドを設定', 
                 json.dumps({
                     "action": "update",
-                    "type": "user_info",
-                    "target": "stage_change_remind_type",
+                    "type": "",
+                    "target_table": "user_info",
+                    "target_element": "stage_change_remind_type",
                     "new_value": co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK,
-                    "current_value": userInfo.stage_change_remind_type
+                    "current_value": userInfo.stage_change_remind_type,
+                    "label": "",
+                    "unit_before_value": "",
+                    "unit_after_value": ""
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback(
@@ -149,10 +159,14 @@ def get_user_info_setting_func(userInfo):
                 '日数間隔でリマインドを設定', 
                 json.dumps({
                     "action": "update",
-                    "type": "user_info",
-                    "target": "stage_change_remind_type",
+                    "type": "",
+                    "target_table": "user_info",
+                    "target_element": "stage_change_remind_type",
                     "new_value": co.STAGE_CHANGE_REMIND_TYPE_DAYS,
-                    "current_value": userInfo.stage_change_remind_type
+                    "current_value": userInfo.stage_change_remind_type,
+                    "label": "",
+                    "unit_before_value": "",
+                    "unit_after_value": ""
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback(
@@ -160,10 +174,14 @@ def get_user_info_setting_func(userInfo):
                 'リマインド設定を解除', 
                 json.dumps({
                     "action": "update",
-                    "type": "user_info",
-                    "target": "stage_change_remind_type",
+                    "type": "",
+                    "target_table": "user_info",
+                    "target_element": "stage_change_remind_type",
                     "new_value": co.STAGE_CHANGE_REMIND_TYPE_NOTHING,
-                    "current_value": userInfo.stage_change_remind_type
+                    "current_value": userInfo.stage_change_remind_type,
+                    "label": "",
+                    "unit_before_value": "",
+                    "unit_after_value": ""
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback(
@@ -172,11 +190,15 @@ def get_user_info_setting_func(userInfo):
                 json.dumps({
                     "action": "display",
                     "type": "choices",
-                    "target": "required_working_hours",
+                    "target_table": "user_info",
+                    "target_element": "required_working_hours",
                     "tmp_value": userInfo.required_working_hours,
                     "min": 1,
                     "max": 24,
-                    "current_value": userInfo.required_working_hours
+                    "current_value": userInfo.required_working_hours,
+                    "label": "目標作業時間（1日あたり）",
+                    "unit_before_value": "",
+                    "unit_after_value": "時間"
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback(
@@ -185,11 +207,15 @@ def get_user_info_setting_func(userInfo):
                 json.dumps({
                     "action": "display",
                     "type": "choices",
-                    "target": "starting_time_of_a_day",
+                    "target_table": "user_info",
+                    "target_element": "starting_time_of_a_day",
                     "tmp_value": userInfo.starting_time_of_a_day,
                     "min": 0,
                     "max": 23,
-                    "current_value": userInfo.starting_time_of_a_day
+                    "current_value": userInfo.starting_time_of_a_day,
+                    "label": "1日のはじまりの時刻",
+                    "unit_before_value": "",
+                    "unit_after_value": "時"
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback(
@@ -198,11 +224,15 @@ def get_user_info_setting_func(userInfo):
                 json.dumps({
                     "action": "display",
                     "type": "choices",
-                    "target": "the_last_stage",
+                    "target_table": "user_info",
+                    "target_element": "the_last_stage",
                     "tmp_value": userInfo.the_last_stage,
                     "min": 1,
                     "max": 100,
-                    "current_value": userInfo.the_last_stage
+                    "current_value": userInfo.the_last_stage,
+                    "label": "最大の課題番号",
+                    "unit_before_value": "#",
+                    "unit_after_value": ""
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback(
