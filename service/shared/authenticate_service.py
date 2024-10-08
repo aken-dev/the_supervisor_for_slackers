@@ -29,7 +29,7 @@ def get_authentication(operating_mode, line_user_id, line_name, postback_data=No
                 new_user_flag = False
             userInfo = ui_sv.change_user_allowed(userInfo, co.USER_ALLOWED)
             print('規約同意：{} : {}'.format(line_user_id, line_name))
-            return userInfo, ui_sv.display_user_info(userInfo, new_user_flag)
+            return userInfo, ui_sv.display_user_info_main(userInfo, new_user_flag)
         elif postback_data['action'] == 'agreement' and postback_data['value'] == 'disagree':
             print('規約不同意：{} : {}'.format(line_user_id, line_name))
             return userInfo, lt_sv.get_a_text_send_message('またのご利用をお待ちしております。')

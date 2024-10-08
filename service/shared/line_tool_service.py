@@ -46,9 +46,14 @@ def get_postbacked_data(event):
     data = json.loads(event.postback.data)
     if ('params' in str(event.postback)):
         if('date' in event.postback.params):
-            data['date'] = datetime.datetime.strptime(event.postback.params['date'], '%Y-%m-%d').date()
+            data['postbackedDateType'] = 'date'
+            data['postbackedDateValue'] = datetime.datetime.strptime(event.postback.params['date'], '%Y-%m-%d').date()
         elif('time' in event.postback.params):
-            data['time'] = datetime.datetime.strptime('20200101{}'.format(event.postback.params['time']), '%H:%M').time()
+            data['postbackedDateType'] = 'time'
+            data['postbackedDateValue'] = datetime.datetime.strptime('20200101{}'.format(event.postback.params['time']), '%H:%M').time()
         elif('datetime' in event.postback.params):
-            data['datetime'] = datetime.datetime.strptime(event.postback.params['datetime'], '%Y-%m-%dT%H:%M')
+            data['postbackedDateType'] = 'datetime'
+            data['postbackedDateValue'] = datetime.datetime.strptime(event.postback.params['datetime'], '%Y-%m-%dT%H:%M')
+    else:
+        data['postbackedDateType'] = 'nothing'
     return data

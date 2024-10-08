@@ -9,7 +9,7 @@ class UserInfo:
     line_name: str = None #LINE_NAME（登録時）
     allowed: int = co.USER_UNREGISTERED
     supervisor_flag: bool = False #システム管理者フラグ
-    the_last_stage: int = 35 #最後の課題番号
+    the_last_stage: int = 10 #最後の課題番号
     current_stage: int = 1 #現在の課題番号 DEFAULT=1
     stage_change_remind_type: int = co.STAGE_CHANGE_REMIND_TYPE_NOTHING #課題番号変更リマインド間隔種別（0=しない，1=曜日，2=日数） DEFAULT=0
     stage_change_remind_value: int = 0 #課題番号変更リマインド間隔（0~6=月〜日曜日 or 日数） DEFAULT=0

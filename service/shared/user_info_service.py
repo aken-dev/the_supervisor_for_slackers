@@ -58,7 +58,7 @@ def update_user_info(userInfo, target_column, new_value):
     else:
         return userInfo
 
-def display_user_info(userInfo, new_user_flag=False):
+def display_user_info_main(userInfo, new_user_flag=False):
     msg_instances = []
     if new_user_flag == True:
         msg_instances.append(lt_sv.get_a_text_send_message(
@@ -68,11 +68,11 @@ def display_user_info(userInfo, new_user_flag=False):
         msg_instances.append(lt_sv.get_a_text_send_message(
             '初期の設定内容だ。必要に応じて変更してくれ。' 
         ))
-    msg_instances.append(get_user_info_setting(userInfo))
-    msg_instances.append(get_txt_with_quick_reply_btns_for_user_info(userInfo))
+    msg_instances.append(get_user_info_details(userInfo))
+    msg_instances.append(get_user_info_setting_func(userInfo))
     return msg_instances
     
-def get_user_info_setting(userInfo):
+def get_user_info_details(userInfo):
     return lt_sv.get_a_text_send_message(
         '【現在の設定内容】\n\n'
         + '[現在の課題番号]\n   #{}\n\n'.format(userInfo.current_stage)
@@ -101,7 +101,7 @@ def get_user_info_setting(userInfo):
         + '[最後の課題番号]\n   #{}\n\n'.format(userInfo.the_last_stage)
     )
     
-def get_txt_with_quick_reply_btns_for_user_info(userInfo):
+def get_user_info_setting_func(userInfo):
     return lt_sv.get_a_text_send_message_includes_quick_reply_buttons(
         '設定変更は下記のボタンから頼む。',
         [
@@ -216,4 +216,4 @@ def get_txt_with_quick_reply_btns_for_user_info(userInfo):
             )
         ]
     )
-        
+    

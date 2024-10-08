@@ -10,4 +10,5 @@ def reply_to_message_postbacked(operating_mode, event, line_name):
         return authenticate_msg_instance
     elif userInfo == None:
         return lt_sv.get_a_text_send_message('ユーザ認証に失敗しました。')
+    
     return lt_sv.get_a_text_send_message('ポストバックメッセージを受け取りました。')
