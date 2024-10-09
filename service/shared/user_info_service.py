@@ -33,30 +33,26 @@ def add_new_user(line_user_id, line_name):
         updated_by = sys._getframe().f_code.co_name
     )
     result_count = ui_rp.userinfo_new_user_insert(userInfo)
-    if result_count == 0:
-        return None
-    else:
-        return userInfo
+    return userInfo if result_count != 0 else None
 
 def change_user_allowed(userInfo, new_allowed):
     userInfo.allowed = new_allowed
     userInfo.updated_datetime = datetime.datetime.now(),
     userInfo.updated_by = sys._getframe().f_code.co_name
     result_count = ui_rp.userinfo_update(userInfo, 'allowed')
-    if result_count == 0:
-        return None
-    else:
-        return userInfo
+    return userInfo if result_count != 0 else None
 
 def update_user_info(userInfo, target_element_column, new_value):
-    eval('userInfo.{} = {}'.format(target_element_column, new_value))
+    exec('userInfo.{} = {}{}{}'.format(
+        target_element_column,
+        '' if type(new_value) == 'number' else '"',
+        new_value,
+        '' if type(new_value) == 'number' else '"'        
+    ))
     userInfo.updated_datetime = datetime.datetime.now(),
     userInfo.updated_by = sys._getframe().f_code.co_name
     result_count = ui_rp.userinfo_update(userInfo, target_element_column)
-    if result_count == 0:
-        return None
-    else:
-        return userInfo
+    return userInfo if result_count != 0 else None
 
 def display_user_info_main(userInfo, new_user_flag=False):
     msg_instances = []
@@ -149,7 +145,7 @@ def get_user_info_setting_func(userInfo):
                     "target_element": "stage_change_remind_type",
                     "new_value": co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK,
                     "current_value": userInfo.stage_change_remind_type,
-                    "label": "",
+                    "label": "リマインド設定",
                     "unit_before_value": "",
                     "unit_after_value": ""
                 })
@@ -164,7 +160,7 @@ def get_user_info_setting_func(userInfo):
                     "target_element": "stage_change_remind_type",
                     "new_value": co.STAGE_CHANGE_REMIND_TYPE_DAYS,
                     "current_value": userInfo.stage_change_remind_type,
-                    "label": "",
+                    "label": "リマインド設定",
                     "unit_before_value": "",
                     "unit_after_value": ""
                 })
@@ -179,7 +175,7 @@ def get_user_info_setting_func(userInfo):
                     "target_element": "stage_change_remind_type",
                     "new_value": co.STAGE_CHANGE_REMIND_TYPE_NOTHING,
                     "current_value": userInfo.stage_change_remind_type,
-                    "label": "",
+                    "label": "リマインド設定",
                     "unit_before_value": "",
                     "unit_after_value": ""
                 })
@@ -196,7 +192,7 @@ def get_user_info_setting_func(userInfo):
                     "min": 1,
                     "max": 24,
                     "current_value": userInfo.required_working_hours,
-                    "label": "目標作業時間（1日あたり）",
+                    "label": "目標作業時間",
                     "unit_before_value": "",
                     "unit_after_value": "時間"
                 })

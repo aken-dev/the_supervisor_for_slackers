@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import json
-import datetime
 from linebot.models import PostbackAction, QuickReplyButton, MessageAction, QuickReply, TextSendMessage
+import service.shared.datetime_calc_service as datetime_calc_sv
 
 #シンプルなテキストメッセージを作成
 def get_a_text_send_message(text):
@@ -17,23 +17,23 @@ def get_a_text_send_message_includes_quick_reply_buttons(text, quick_reply_butto
                                quick_reply=QuickReply(items=[quick_reply_buttons])) #テキストに付随するクイックリプライボタン
 
 #クイックリプライボタン作成（シンプルテキスト用）
-def get_quick_reply_button(lavel_text, body_text):
+def get_quick_reply_button(label_text, body_text):
     return QuickReplyButton(action=MessageAction(
-        label=f"{lavel_text}", #ボタンの見出し
+        label=f"{label_text}", #ボタンの見出し
         text=f"{body_text}")) #ユーザーがボタンを押すと送られるテキスト
 
 #クイックリプライボタン作成（ポストバック用）
-def get_quick_reply_button_for_postback(lavel_text, display_text, data):
+def get_quick_reply_button_for_postback(label_text, display_text, data):
     return QuickReplyButton(action=PostbackAction(
-        label=f"{lavel_text}", #ボタンの見出し
+        label=f"{label_text}", #ボタンの見出し
         display_text=f"{display_text}", #ユーザーがボタンを押すと送られるテキスト
         data=f"{data}")) #ユーザーがボタンを押すと裏で送られるテキスト
 
 #クイックリプライボタン作成（ポストバック用日付選択アクション）
-def get_quick_reply_button_for_postback_datetime(lavel_text, data, mode='datetime', initial='', max='', min=''):
+def get_quick_reply_button_for_postback_datetime(label_text, data, mode='datetime', initial='', max='', min=''):
     return QuickReplyButton(action={
   "type": "datetimepicker",
-  "label": f"{lavel_text}", #ボタンの見出し
+  "label": f"{label_text}", #ボタンの見出し
   "data": f"{data}", #ユーザーの選択した日時のほか、ボタンを押すと裏で送られるテキスト
   "mode": f"{mode}", #選択肢（date=日付のみ，datetime=日時）
   "initial": f"{initial}", #初期値
@@ -47,13 +47,13 @@ def get_postbacked_data(event):
     if ('params' in str(event.postback)):
         if('date' in event.postback.params):
             data['postbackedDateType'] = 'date'
-            data['postbackedDateValue'] = datetime.datetime.strptime(event.postback.params['date'], '%Y-%m-%d').date()
+            data['postbackedDateValue'] = datetime_calc_sv.get_datetime_from_string(event.postback.params['date'], 'date')
         elif('time' in event.postback.params):
             data['postbackedDateType'] = 'time'
-            data['postbackedDateValue'] = datetime.datetime.strptime('20200101{}'.format(event.postback.params['time']), '%H:%M').time()
+            data['postbackedDateValue'] = datetime_calc_sv.get_datetime_from_string(event.postback.params['time'], 'time')
         elif('datetime' in event.postback.params):
             data['postbackedDateType'] = 'datetime'
-            data['postbackedDateValue'] = datetime.datetime.strptime(event.postback.params['datetime'], '%Y-%m-%dT%H:%M')
+            data['postbackedDateValue'] = datetime_calc_sv.get_datetime_from_string(event.postback.params['datetime'])
     else:
         data['postbackedDateType'] = 'nothing'
     return data

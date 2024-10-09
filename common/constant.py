@@ -44,4 +44,4 @@ PROCESS_STATUS_RECORDED_SUCCESS = 3
 PROCESS_STATUS_RECORDED_FAILURE = 4
 PROCESS_STATUS_MEMO_ONLY = 5
 #WEEKDAY
-WEEKDAY = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日']
+WEEKDAY = ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日', '日曜日']
