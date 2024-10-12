@@ -8,8 +8,8 @@ class WorkingRecord:
     user_id: int = None #ユーザID
     line_user_id: str = None #LINE_USER_ID
     process_category: int = co.PROCESS_CATEGORY_RECORD_WORKING_HOURS #処理区分（0=メンテ，1=装着記録，2=メモのみ）DEFAULT=1
-    process_status: int = co.PROCESS_STATUS_NOT_STARTED #処理状態（0=未開始，1=記録中，2=記録正常終了，3=記録異常終了，4=メモのみ）DEFAULT=0
-    current_stage: int = None #現在の作業番号
+    process_status: int = co.PROCESS_STATUS_NOT_STARTED #処理状態（0=メンテナンス, 1=未開始，2=記録中，3=記録正常終了，4=記録異常終了，5=メモのみ）DEFAULT=0
+    stage: int = None #作業番号
     start_time: datetime = None #作業開始日時
     finish_time: datetime = None #作業終了日時
     registered_datetime: datetime = None #登録日時

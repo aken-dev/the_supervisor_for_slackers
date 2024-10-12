@@ -94,8 +94,10 @@ def main(operating_mode, userInfo, postbacked_data):
             '[変更完了]\n'
             + ' {}\n'.format(postbacked_data['label'])
             + '    {}\n'.format(
-                datetime_calc_sv.get_datetime_from_string(
-                    postbacked_data['current_value'], postbacked_data['postbackedDateType']
+                '' if postbacked_data['current_value'] == '' else (
+                    datetime_calc_sv.get_datetime_from_string(
+                        postbacked_data['current_value'], postbacked_data['postbackedDateType']
+                    )
                 )
             )
             + '         → {}'.format(postbacked_data['postbackedDateValue'])
