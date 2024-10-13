@@ -6,16 +6,12 @@ import common.constant as co
 def main(operating_mode, userInfo, recieved_text):
     if wr_sv.get_a_working_record(
         userInfo, co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, co.PROCESS_STATUS_ON_RECORDING) != None:
-        return lt_sv.get_a_text_send_message('今、作業中になってるぞ。')
-    workingRecord = wr_sv.add_new_working_record(userInfo)
-    if workingRecord == None:
-        return lt_sv.get_a_text_send_message('作業レコード追加に失敗しました。')
-    workingRecord = wr_sv.start_the_work(workingRecord)
-    if workingRecord == None:
-        return lt_sv.get_a_text_send_message('作業レコード開始更新に失敗しました。')
+        return lt_sv.get_a_text_send_message('今、すでに作業中になってるぞ。')
+    workingRecord = wr_sv.start_the_work(userInfo)
+    if workingRecord == None: return lt_sv.get_a_text_send_message('すまん、暫く経ってから再度試してくれ。')
     return [
         lt_sv.get_a_text_send_message(
-        '作業開始したんだな。\n'
+        '作業 #{} を開始したんだな。\n'.format(workingRecord.stage)
         + '承ったぞ。'
         )
     ]

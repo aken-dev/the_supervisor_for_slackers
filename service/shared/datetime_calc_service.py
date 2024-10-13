@@ -12,7 +12,7 @@ def get_datetime_from_string(dt_str, type='datetime', format=None):
     return None
 
 # Datetime型各種をLINEの日付文字列に変換
-def get_string_from_datetime(dt_instance, type='datetime', format=None):
+def get_string_from_datetime(dt_instance=datetime.datetime.now(), type='datetime', format=None):
     if type == 'datetime':
         return datetime.datetime.strftime(dt_instance, '%Y-%m-%dT%H:%M' if format == None else format)
     elif type == 'time':

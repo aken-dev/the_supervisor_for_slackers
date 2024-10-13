@@ -79,7 +79,7 @@ def main(operating_mode, userInfo, postbacked_data):
                 "unit_before_value": "変更の",
                 "unit_after_value": "日後"
             }
-            msg_instance.append(cm_sv.get_standard_choices(new_data))
+            msg_instance.append(cm_sv.get_user_info_choices(new_data))
         return msg_instance
     # リマインドする曜日を変更した場合
     elif userInfo.stage_change_remind_type == co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK \

@@ -28,9 +28,9 @@ def a_working_record_select_by_user_id(
         cursor = connection.cursor()
         sql = "SELECT * FROM `working_record` " \
         "WHERE `user_id`=%s AND `process_category` =%s AND `process_status` =%s " \
-        "ORDER BY start_time DESC LIMIT {}".format(limit_value)
-        result_count = cursor.execute(sql, (user_id, process_category, process_status))
-        result = cursor.fetchone()
+        "ORDER BY start_time DESC LIMIT %s"
+        result_count = cursor.execute(sql, (user_id, process_category, process_status, limit_value))
+        result = cursor.fetchall()
         connection.close()
         return result_count, result
     except Exception as e:
@@ -39,22 +39,64 @@ def a_working_record_select_by_user_id(
         print(e, type(e))
         print(traceback.format_exc())
 
-def a_working_record_select_by_user_id_start_time(
+def a_working_record_select_by_user_id_start_time_for_past(
     user_id, 
     start_time,
-    process_category=co.PROCESS_CATEGORY_RECORD_WORKING_HOURS,
-    process_status=co.PROCESS_STATUS_ON_RECORDING,
-    limit_value=1):
+    limit_value=1,
+    sort_order='DESC'):
     try:
         connection = db.connect()
         cursor = connection.cursor()
         sql = "SELECT * FROM `working_record` " \
         + "WHERE `user_id`=%s AND start_time <=%s" \
         + "AND `process_category` =%s AND `process_status` =%s " \
-        + "ORDER BY `start_time` DESC LIMIT %s"
+        + "OR `user_id`=%s AND start_time <=%s" \
+        + "AND `process_category` =%s AND `process_status` =%s " \
+        + "ORDER BY `start_time` {} LIMIT %s".format(sort_order)
         result_count = cursor.execute(sql, (
-            user_id, start_time, process_category, process_status, limit_value))
-        result = cursor.fetchone()
+            user_id, 
+            start_time, 
+            co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, 
+            co.PROCESS_STATUS_ON_RECORDING, 
+            user_id, 
+            start_time, 
+            co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, 
+            co.PROCESS_STATUS_RECORDED_SUCCESS, 
+            limit_value))
+        result = cursor.fetchall()
+        connection.close()
+        return result_count, result
+    except Exception as e:
+        connection.close()
+        print("Exception")
+        print(e, type(e))
+        print(traceback.format_exc())
+
+def a_working_record_select_by_user_id_start_time_for_future(
+    user_id, 
+    start_time,
+    limit_value=1,
+    sort_order='ASC'):
+    try:
+        connection = db.connect()
+        cursor = connection.cursor()
+        sql = "SELECT * FROM `working_record` " \
+        + "WHERE `user_id`=%s AND start_time <=%s" \
+        + "AND `process_category` =%s AND `process_status` =%s " \
+        + "OR `user_id`=%s AND start_time >=%s" \
+        + "AND `process_category` =%s AND `process_status` =%s " \
+        + "ORDER BY `start_time` {} LIMIT %s".format(sort_order)
+        result_count = cursor.execute(sql, (
+            user_id, 
+            start_time, 
+            co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, 
+            co.PROCESS_STATUS_ON_RECORDING, 
+            user_id, 
+            start_time, 
+            co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, 
+            co.PROCESS_STATUS_RECORDED_SUCCESS, 
+            limit_value))
+        result = cursor.fetchall()
         connection.close()
         return result_count, result
     except Exception as e:
@@ -71,7 +113,8 @@ def new_working_record_insert(workingRecord):
         + "(`user_id`, `line_user_id`, `process_category`, " \
         + "`process_status`, `stage`, "  \
         + "`start_time`, `finish_time`, " \
-        + " `registered_datetime`, `registered_by`, `updated_datetime`, `updated_by`)" \
+        + " `registered_datetime`, `registered_by`, " \
+        + "`updated_datetime`, `updated_by`)" \
         + " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         result_count = cursor.execute(sql, (workingRecord.user_id, workingRecord.line_user_id, workingRecord.process_category,
                                             workingRecord.process_status, workingRecord.stage, 

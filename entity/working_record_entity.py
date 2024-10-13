@@ -26,7 +26,7 @@ class WorkingRecord:
         self.line_user_id = record['line_user_id']
         self.process_category = record['process_category']
         self.process_status = record['process_status']
-        self.current_stage = record['current_stage']
+        self.stage = record['stage']
         self.start_time = record['start_time']
         self.finish_time = record['finish_time']
         self.registered_datetime = record['registered_datetime']

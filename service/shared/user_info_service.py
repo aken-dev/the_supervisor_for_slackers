@@ -5,6 +5,7 @@ import json
 import common.constant as co
 import repository.user_info_repository as ui_rp
 import service.shared.line_tool_service as lt_sv
+import service.shared.datetime_calc_service as dc_sv
 from entity.user_info_entity import UserInfo
 
 # UserInfo
@@ -127,13 +128,13 @@ def get_user_info_setting_func(userInfo):
                     "target_element": "recent_stage_changed_date",
                     "new_value": "date",
                     "label": "直近の番号変更日",
-                    "current_value": userInfo.recent_stage_changed_date.strftime("%Y-%m-%d") if 
+                    "current_value": dc_sv.get_string_from_datetime(userInfo.recent_stage_changed_date, 'date') if 
                     userInfo.recent_stage_changed_date != None else '',
                 }),
                 'date',
-                userInfo.recent_stage_changed_date.strftime("%Y-%m-%d") if 
+                dc_sv.get_string_from_datetime(userInfo.recent_stage_changed_date, 'date') if 
                 userInfo.recent_stage_changed_date != None else '',
-                datetime.datetime.now().strftime("%Y-%m-%d")
+                dc_sv.get_string_from_datetime(datetime.datetime.now(), 'date')
             ),
             lt_sv.get_quick_reply_button_for_postback(
                 '曜日でリマインドを設定', 
