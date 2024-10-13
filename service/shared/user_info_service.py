@@ -132,6 +132,8 @@ def get_user_info_setting_func(userInfo):
                     "label": "直近の番号変更日",
                     "cur_val": dc_sv.get_string_from_datetime(userInfo.recent_stage_changed_date, 'date') if 
                     userInfo.recent_stage_changed_date != None else '',
+                    "uni_before_val": "",
+                    "uni_after_val": ""
                 }),
                 'date',
                 dc_sv.get_string_from_datetime(userInfo.recent_stage_changed_date, 'date') if 

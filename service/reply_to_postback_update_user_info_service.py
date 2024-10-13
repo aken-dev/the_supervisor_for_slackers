@@ -3,7 +3,7 @@ import common.constant as co
 import json
 import service.shared.line_tool_service as lt_sv
 import service.shared.user_info_service as ui_sv
-import service.shared.datetime_calc_service as datetime_calc_sv
+import service.shared.datetime_calc_service as dc_sv
 import service.shared.choice_maker_service as cm_sv
 
 def main(operating_mode, userInfo, postbacked_data):
@@ -11,7 +11,7 @@ def main(operating_mode, userInfo, postbacked_data):
     userInfo = ui_sv.update_user_info(
         userInfo, 
         postbacked_data['tar_el'], 
-        postbacked_data['new_val'] if postbacked_data['postbackedDateType'] == 'nothing' 
+        postbacked_data['new_val'] if postbacked_data['postbackedDateType'] == 'not_date' 
         else postbacked_data['postbackedDateValue']
     )
     if userInfo == None:
@@ -91,13 +91,13 @@ def main(operating_mode, userInfo, postbacked_data):
             + '    → {}'.format(postbacked_data['label'])
         )
     # datetime関連のパラメータ変更の場合
-    elif postbacked_data['postbackedDateType'] != 'nothing':
+    elif postbacked_data['postbackedDateType'] != 'not_date':
         return lt_sv.get_a_text_send_message(
             '[変更完了]\n'
             + ' {}\n'.format(postbacked_data['label'])
             + '    {}\n'.format(
                 '' if postbacked_data['cur_val'] == '' else (
-                    datetime_calc_sv.get_datetime_from_string(
+                    dc_sv.get_datetime_from_string(
                         postbacked_data['cur_val'], postbacked_data['postbackedDateType']
                     )
                 )

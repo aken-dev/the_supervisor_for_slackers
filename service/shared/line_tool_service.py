@@ -55,5 +55,5 @@ def get_postbacked_data(event):
             data['postbackedDateType'] = 'datetime'
             data['postbackedDateValue'] = datetime_calc_sv.get_datetime_from_string(event.postback.params['datetime'])
     else:
-        data['postbackedDateType'] = 'nothing'
+        data['postbackedDateType'] = 'not_date'
     return data

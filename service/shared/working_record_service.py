@@ -9,12 +9,19 @@ import service.shared.datetime_calc_service as dc_sv
 from entity.working_record_entity import WorkingRecord
 
 # WorkingRecord
-def get_a_working_record(userInfo, process_category=None, process_status=None, limit_value=1):
+def get_a_working_record_by_status(userInfo, process_category=None, process_status=None, limit_value=1):
     result_count, result = wr_rp.a_working_record_select_by_user_id(
         userInfo.id, process_category, process_status, limit_value)
     if result_count <= 0: return None
     workingRecord = WorkingRecord()
     workingRecord.setEntityFromRecord(result[0])
+    return workingRecord
+
+def get_a_working_record_by_record_id(id):
+    result_count, result = wr_rp.a_working_record_select_by_id(id)
+    if result_count <= 0: return None
+    workingRecord = WorkingRecord()
+    workingRecord.setEntityFromRecord(result)
     return workingRecord
 
 def add_new_working_record(userInfo):
@@ -66,7 +73,7 @@ def start_the_work(userInfo, workingRecord=None):
 
 def finish_the_work(userInfo, workingRecord=None):
     if workingRecord == None:
-        workingRecord = get_a_working_record(
+        workingRecord = get_a_working_record_by_status(
             userInfo, co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, co.PROCESS_STATUS_ON_RECORDING
         )
     if workingRecord == None \
@@ -116,7 +123,7 @@ def display_working_history_main(userInfo, target_start_time=None):
             None if future_record_count_asc < 2 else futureWorkingRecord.start_time,
             None if result_count < 2 else workingRecord.start_time + datetime.timedelta(seconds=-1)
         )
-    return lt_sv.get_a_text_send_message('記録が１件も無いぞ。')
+    else: return lt_sv.get_a_text_send_message('記録が１件も無いぞ。')
         
 def get_a_history(userInfo, workingRecord, future_start_time, previous_start_time):
     quick_reply_btns = []
@@ -172,13 +179,19 @@ def get_a_history(userInfo, workingRecord, future_start_time, previous_start_tim
                     "label": "作業開始日時",
                     "cur_val": dc_sv.get_string_from_datetime(workingRecord.start_time) if 
                     workingRecord.start_time != None else '',
+                    "uni_before_val": "",
+                    "uni_after_val": ""
                 }),
                 'datetime',
                 dc_sv.get_string_from_datetime(workingRecord.start_time) if 
                 workingRecord.start_time!= None else '',
                 dc_sv.get_string_from_datetime() if workingRecord.finish_time == None else 
                 dc_sv.get_string_from_datetime(workingRecord.finish_time)
-            ), 
+            )
+        ]       
+    )
+    if workingRecord.process_status == co.PROCESS_STATUS_RECORDED_SUCCESS:
+        quick_reply_btns.append(
             lt_sv.get_quick_reply_button_for_postback_datetime( 
                 '作業終了日時を修正', 
                 json.dumps({
@@ -189,8 +202,9 @@ def get_a_history(userInfo, workingRecord, future_start_time, previous_start_tim
                     "tar_el": "finish_time",
                     "new_val": "datetime",
                     "label": "作業終了日時",
-                    "cur_val": dc_sv.get_string_from_datetime(workingRecord.finish_time) if 
-                    workingRecord.finish_time != None else '(作業中)',
+                    "cur_val": dc_sv.get_string_from_datetime(workingRecord.finish_time),
+                    "uni_before_val": "",
+                    "uni_after_val": ""
                 }),
                 'datetime',
                 dc_sv.get_string_from_datetime(workingRecord.finish_time) if 
@@ -199,8 +213,8 @@ def get_a_history(userInfo, workingRecord, future_start_time, previous_start_tim
                 dc_sv.get_string_from_datetime(workingRecord.start_time) if 
                 workingRecord.start_time!= None else ''
             )
-        ]       
-    )
+        )
+        
     return lt_sv.get_a_text_send_message_includes_quick_reply_buttons(
         '【作業履歴】\n\n' \
         + '[課題番号]\n   #{}\n\n'.format(workingRecord.stage)
