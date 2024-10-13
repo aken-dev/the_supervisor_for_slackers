@@ -11,7 +11,7 @@ def main(operating_mode, userInfo, recieved_text):
     if workingRecord == None: return lt_sv.get_a_text_send_message('すまん、暫く経ってから再度試してくれ。')
     return [
         lt_sv.get_a_text_send_message(
-        '# {} の作業を中断したんだな。\n'.format(workingRecord.stage)
+        '# {} の作業が終わったんだな。\n'.format(workingRecord.stage)
         + '承ったぞ。'
         )
     ]

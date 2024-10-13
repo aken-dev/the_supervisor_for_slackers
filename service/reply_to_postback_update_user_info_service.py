@@ -10,36 +10,36 @@ def main(operating_mode, userInfo, postbacked_data):
     # DBレコード更新処理
     userInfo = ui_sv.update_user_info(
         userInfo, 
-        postbacked_data['target_element'], 
-        postbacked_data['new_value'] if postbacked_data['postbackedDateType'] == 'nothing' 
+        postbacked_data['tar_el'], 
+        postbacked_data['new_val'] if postbacked_data['postbackedDateType'] == 'nothing' 
         else postbacked_data['postbackedDateValue']
     )
     if userInfo == None:
         return lt_sv.get_a_text_send_message('ユーザ情報の更新に失敗しました。')
     ## 以下、返信テキストを作成する
     # リマインド種別を変更した場合
-    elif postbacked_data['target_element'] == 'stage_change_remind_type':
+    elif postbacked_data['tar_el'] == 'stage_change_remind_type':
         msg_instance = [
             lt_sv.get_a_text_send_message(
                 '[変更完了]\n'
                 + ' {}\n'.format(postbacked_data['label'])
                 + '    {}\n'.format(
-                    'リマインドしない' if postbacked_data['current_value'] == co.STAGE_CHANGE_REMIND_TYPE_NOTHING else (
-                        '曜日ごとにリマインド' if postbacked_data['current_value'] == co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK else (
-                            '番号変更からの日数経過でリマインド'if postbacked_data['current_value'] == co.STAGE_CHANGE_REMIND_TYPE_DAYS else '設定なし'
+                    'リマインドしない' if postbacked_data['cur_val'] == co.STAGE_CHANGE_REMIND_TYPE_NOTHING else (
+                        '曜日ごとにリマインド' if postbacked_data['cur_val'] == co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK else (
+                            '番号変更からの日数経過でリマインド'if postbacked_data['cur_val'] == co.STAGE_CHANGE_REMIND_TYPE_DAYS else '設定なし'
                         )
                     )
                 )
                 + '         → {}'.format(
-                    'リマインドしない' if postbacked_data['new_value'] == co.STAGE_CHANGE_REMIND_TYPE_NOTHING else (
-                        '曜日ごとにリマインド' if postbacked_data['new_value'] == co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK else (
-                            '番号変更からの日数経過でリマインド'if postbacked_data['new_value'] == co.STAGE_CHANGE_REMIND_TYPE_DAYS else '設定なし'
+                    'リマインドしない' if postbacked_data['new_val'] == co.STAGE_CHANGE_REMIND_TYPE_NOTHING else (
+                        '曜日ごとにリマインド' if postbacked_data['new_val'] == co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK else (
+                            '番号変更からの日数経過でリマインド'if postbacked_data['new_val'] == co.STAGE_CHANGE_REMIND_TYPE_DAYS else '設定なし'
                         )
                     )
                 )
             )
         ]
-        if postbacked_data['new_value'] == co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK:
+        if postbacked_data['new_val'] == co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK:
             quick_reply_btns = []
             for i in range(0, 6 + 1):
                 day_label = co.WEEKDAY[i]
@@ -50,13 +50,14 @@ def main(operating_mode, userInfo, postbacked_data):
                         json.dumps({
                             "action": "update",
                             "type": "",
-                            "target_table": "user_info",
-                            "target_element": "stage_change_remind_value",
-                            "new_value": i,
-                            "current_value": '',
+                            "tar_tbl": "user_info",
+                            "tar_id": "",
+                            "tar_el": "stage_change_remind_value",
+                            "new_val": i,
+                            "cur_val": '',
                             "label": '（毎週）{}にリマインド'.format(day_label),
-                            "unit_before_value": "",
-                            "unit_after_value": ""
+                            "uni_before_val": "",
+                            "uni_after_val": ""
                         })
                     )
                 )
@@ -65,25 +66,26 @@ def main(operating_mode, userInfo, postbacked_data):
                     '何曜日にリマインドする？', quick_reply_btns
                 )
             )
-        elif postbacked_data['new_value'] == co.STAGE_CHANGE_REMIND_TYPE_DAYS:
+        elif postbacked_data['new_val'] == co.STAGE_CHANGE_REMIND_TYPE_DAYS:
             new_data = {
                 "action": "display",
                 "type": "choices",
-                "target_table": "user_info",
-                "target_element": "stage_change_remind_value",
-                "tmp_value": 5,
+                "tar_tbl": "user_info",
+                "tar_id": "",
+                "tar_el": "stage_change_remind_value",
+                "tmp_val": 5,
                 "min": 1,
                 "max": 100,
-                "current_value": "(未設定)",
+                "cur_val": "(未設定)",
                 "label": "間隔",
-                "unit_before_value": "変更の",
-                "unit_after_value": "日後"
+                "uni_before_val": "変更の",
+                "uni_after_val": "日後"
             }
-            msg_instance.append(cm_sv.get_user_info_choices(new_data))
+            msg_instance.append(cm_sv.get_standard_choices(new_data))
         return msg_instance
     # リマインドする曜日を変更した場合
     elif userInfo.stage_change_remind_type == co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK \
-    and postbacked_data['target_element'] == 'stage_change_remind_value':
+    and postbacked_data['tar_el'] == 'stage_change_remind_value':
         return lt_sv.get_a_text_send_message(
             '[変更完了]\n'
             + '    → {}'.format(postbacked_data['label'])
@@ -94,9 +96,9 @@ def main(operating_mode, userInfo, postbacked_data):
             '[変更完了]\n'
             + ' {}\n'.format(postbacked_data['label'])
             + '    {}\n'.format(
-                '' if postbacked_data['current_value'] == '' else (
+                '' if postbacked_data['cur_val'] == '' else (
                     datetime_calc_sv.get_datetime_from_string(
-                        postbacked_data['current_value'], postbacked_data['postbackedDateType']
+                        postbacked_data['cur_val'], postbacked_data['postbackedDateType']
                     )
                 )
             )
@@ -108,10 +110,10 @@ def main(operating_mode, userInfo, postbacked_data):
             '[変更完了]\n'
             + ' {}\n'.format(postbacked_data['label'])
             + '    {} {} {}\n'.format(
-                postbacked_data['unit_before_value'], postbacked_data['current_value'], postbacked_data['unit_after_value']
+                postbacked_data['uni_before_val'], postbacked_data['cur_val'], postbacked_data['uni_after_val']
             )
             + '         → {} {} {}'.format(
-                postbacked_data['unit_before_value'], postbacked_data['new_value'], postbacked_data['unit_after_value']
+                postbacked_data['uni_before_val'], postbacked_data['new_val'], postbacked_data['uni_after_val']
             )
         )
         

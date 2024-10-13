@@ -127,7 +127,7 @@ def get_a_history(userInfo, workingRecord, future_start_time, previous_start_tim
             json.dumps({
                 "action": "display",
                 "type": "working_history",
-                "target_datetime": dc_sv.get_string_from_datetime(previous_start_time)
+                "target": dc_sv.get_string_from_datetime(previous_start_time, 'dt_with_sec')
             })
         ))
     if future_start_time != None:
@@ -137,56 +137,78 @@ def get_a_history(userInfo, workingRecord, future_start_time, previous_start_tim
             json.dumps({
                 "action": "display",
                 "type": "working_history",
-                "target_datetime": dc_sv.get_string_from_datetime(future_start_time)
+                "target": dc_sv.get_string_from_datetime(future_start_time, 'dt_with_sec')
             })
         ))
-    quick_reply_btns.append(lt_sv.get_quick_reply_button_for_postback(
-        '課題番号を変更', 
-        '課題番号を変更', 
-        json.dumps({
-            "action": "display",
-            "type": "choices",
-            "target_table": "working_record",
-            "target_record": workingRecord.id,
-            "target_element": "stage",
-            "tmp_value": workingRecord.stage,
-            "min": 1,
-            "max": userInfo.the_last_stage,
-            "current_value": workingRecord.stage,
-            "label": "課題番号",
-            "unit_before_value": "#",
-            "unit_after_value": ""
-        })
-    ))
-    quick_reply_btns.append(
+    quick_reply_btns.extend(
+        [
+            lt_sv.get_quick_reply_button_for_postback(
+                '課題番号を変更', 
+                '課題番号を変更', 
+                json.dumps({
+                    "action": "display",
+                    "type": "choices",
+                    "tar_tbl": "working_record",
+                    "tar_id": workingRecord.id,
+                    "tar_el": "stage",
+                    "tmp_val": workingRecord.stage,
+                    "min": 1,
+                    "max": userInfo.the_last_stage,
+                    "cur_val": workingRecord.stage,
+                    "label": "課題番号",
+                    "uni_before_val": "#",
+                    "uni_after_val": ""
+                })
+            ),  
             lt_sv.get_quick_reply_button_for_postback_datetime( 
                 '作業開始日時を修正', 
                 json.dumps({
                     "action": "update",
                     "type": "",
-                    "target_record": workingRecord.id,
-                    "target_table": "working_record",
-                    "target_element": "start_time",
-                    "new_value": "datetime",
+                    "tar_tbl": "working_record",
+                    "tar_id": workingRecord.id,
+                    "tar_el": "start_time",
+                    "new_val": "datetime",
                     "label": "作業開始日時",
-                    "current_value": dc_sv.get_string_from_datetime(workingRecord.start_time) if 
+                    "cur_val": dc_sv.get_string_from_datetime(workingRecord.start_time) if 
                     workingRecord.start_time != None else '',
                 }),
                 'datetime',
                 dc_sv.get_string_from_datetime(workingRecord.start_time) if 
                 workingRecord.start_time!= None else '',
-                dc_sv.get_string_from_datetime()
-            ),        
+                dc_sv.get_string_from_datetime() if workingRecord.finish_time == None else 
+                dc_sv.get_string_from_datetime(workingRecord.finish_time)
+            ), 
+            lt_sv.get_quick_reply_button_for_postback_datetime( 
+                '作業終了日時を修正', 
+                json.dumps({
+                    "action": "update",
+                    "type": "",
+                    "tar_tbl": "working_record",
+                    "tar_id": workingRecord.id,
+                    "tar_el": "finish_time",
+                    "new_val": "datetime",
+                    "label": "作業終了日時",
+                    "cur_val": dc_sv.get_string_from_datetime(workingRecord.finish_time) if 
+                    workingRecord.finish_time != None else '(作業中)',
+                }),
+                'datetime',
+                dc_sv.get_string_from_datetime(workingRecord.finish_time) if 
+                workingRecord.finish_time!= None else '',
+                dc_sv.get_string_from_datetime(),
+                dc_sv.get_string_from_datetime(workingRecord.start_time) if 
+                workingRecord.start_time!= None else ''
+            )
+        ]       
     )
     return lt_sv.get_a_text_send_message_includes_quick_reply_buttons(
         '【作業履歴】\n\n' \
         + '[課題番号]\n   #{}\n\n'.format(workingRecord.stage)
         + '[作業開始]\n   {}\n\n'.format(workingRecord.start_time)
-        + '[作業終了]\n   {}\n\n'.format(
-                                            workingRecord.finish_time if 
-                                            workingRecord.process_status == co.PROCESS_STATUS_RECORDED_SUCCESS else 
+        + '[作業終了]\n   {}\n\n'.format(workingRecord.finish_time if 
+                                        workingRecord.process_status == co.PROCESS_STATUS_RECORDED_SUCCESS else 
                                             '（作業中）'
-                                        )
+                                       )
         + '{}'.format('' if workingRecord.memo_1 == None else '[メモ1]\n  {}\n'.format(workingRecord.memo_1))
         + '{}'.format('' if workingRecord.memo_2 == None else '[メモ2]\n  {}\n'.format(workingRecord.memo_2))
         + '{}'.format('' if workingRecord.memo_3 == None else '[メモ3]\n  {}\n'.format(workingRecord.memo_3)),

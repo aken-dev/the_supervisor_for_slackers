@@ -4,7 +4,7 @@ import service.reply_to_postback_update_user_info_service as reply_to_postback_u
 
 
 def action(operating_mode, userInfo, data):
-    if data['target_table'] == 'user_info':
+    if data['tar_tbl'] == 'user_info':
         return reply_to_postback_update_user_info_sv.main(operating_mode, userInfo, data)
     else:
         return lt_sv.get_a_text_send_message('よくわかんねぇデータを受け取ったぞ') 

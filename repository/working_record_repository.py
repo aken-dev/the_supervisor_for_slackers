@@ -81,7 +81,7 @@ def a_working_record_select_by_user_id_start_time_for_future(
         connection = db.connect()
         cursor = connection.cursor()
         sql = "SELECT * FROM `working_record` " \
-        + "WHERE `user_id`=%s AND start_time <=%s" \
+        + "WHERE `user_id`=%s AND start_time >=%s" \
         + "AND `process_category` =%s AND `process_status` =%s " \
         + "OR `user_id`=%s AND start_time >=%s" \
         + "AND `process_category` =%s AND `process_status` =%s " \

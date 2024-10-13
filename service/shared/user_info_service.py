@@ -108,15 +108,16 @@ def get_user_info_setting_func(userInfo):
                 json.dumps({
                     "action": "display",
                     "type": "choices",
-                    "target_table": "user_info",
-                    "target_element": "current_stage",
-                    "tmp_value": userInfo.current_stage,
+                    "tar_tbl": "user_info",
+                    "tar_id": "",
+                    "tar_el": "current_stage",
+                    "tmp_val": userInfo.current_stage,
                     "min": 1,
                     "max": userInfo.the_last_stage,
-                    "current_value": userInfo.current_stage,
+                    "cur_val": userInfo.current_stage,
                     "label": "現在の課題番号",
-                    "unit_before_value": "#",
-                    "unit_after_value": ""
+                    "uni_before_val": "#",
+                    "uni_after_val": ""
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback_datetime( 
@@ -124,11 +125,12 @@ def get_user_info_setting_func(userInfo):
                 json.dumps({
                     "action": "update",
                     "type": "",
-                    "target_table": "user_info",
-                    "target_element": "recent_stage_changed_date",
-                    "new_value": "date",
+                    "tar_tbl": "user_info",
+                    "tar_id": "",
+                    "tar_el": "recent_stage_changed_date",
+                    "new_val": "date",
                     "label": "直近の番号変更日",
-                    "current_value": dc_sv.get_string_from_datetime(userInfo.recent_stage_changed_date, 'date') if 
+                    "cur_val": dc_sv.get_string_from_datetime(userInfo.recent_stage_changed_date, 'date') if 
                     userInfo.recent_stage_changed_date != None else '',
                 }),
                 'date',
@@ -142,13 +144,14 @@ def get_user_info_setting_func(userInfo):
                 json.dumps({
                     "action": "update",
                     "type": "",
-                    "target_table": "user_info",
-                    "target_element": "stage_change_remind_type",
-                    "new_value": co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK,
-                    "current_value": userInfo.stage_change_remind_type,
+                    "tar_tbl": "user_info",
+                    "tar_id": "",
+                    "tar_el": "stage_change_remind_type",
+                    "new_val": co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK,
+                    "cur_val": userInfo.stage_change_remind_type,
                     "label": "リマインド設定",
-                    "unit_before_value": "",
-                    "unit_after_value": ""
+                    "uni_before_val": "",
+                    "uni_after_val": ""
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback(
@@ -157,13 +160,14 @@ def get_user_info_setting_func(userInfo):
                 json.dumps({
                     "action": "update",
                     "type": "",
-                    "target_table": "user_info",
-                    "target_element": "stage_change_remind_type",
-                    "new_value": co.STAGE_CHANGE_REMIND_TYPE_DAYS,
-                    "current_value": userInfo.stage_change_remind_type,
+                    "tar_tbl": "user_info",
+                    "tar_id": "",
+                    "tar_el": "stage_change_remind_type",
+                    "new_val": co.STAGE_CHANGE_REMIND_TYPE_DAYS,
+                    "cur_val": userInfo.stage_change_remind_type,
                     "label": "リマインド設定",
-                    "unit_before_value": "",
-                    "unit_after_value": ""
+                    "uni_before_val": "",
+                    "uni_after_val": ""
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback(
@@ -172,13 +176,14 @@ def get_user_info_setting_func(userInfo):
                 json.dumps({
                     "action": "update",
                     "type": "",
-                    "target_table": "user_info",
-                    "target_element": "stage_change_remind_type",
-                    "new_value": co.STAGE_CHANGE_REMIND_TYPE_NOTHING,
-                    "current_value": userInfo.stage_change_remind_type,
+                    "tar_tbl": "user_info",
+                    "tar_id": "",
+                    "tar_el": "stage_change_remind_type",
+                    "new_val": co.STAGE_CHANGE_REMIND_TYPE_NOTHING,
+                    "cur_val": userInfo.stage_change_remind_type,
                     "label": "リマインド設定",
-                    "unit_before_value": "",
-                    "unit_after_value": ""
+                    "uni_before_val": "",
+                    "uni_after_val": ""
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback(
@@ -187,15 +192,16 @@ def get_user_info_setting_func(userInfo):
                 json.dumps({
                     "action": "display",
                     "type": "choices",
-                    "target_table": "user_info",
-                    "target_element": "required_working_hours",
-                    "tmp_value": userInfo.required_working_hours,
+                    "tar_tbl": "user_info",
+                    "tar_id": "",
+                    "tar_el": "required_working_hours",
+                    "tmp_val": userInfo.required_working_hours,
                     "min": 1,
                     "max": 24,
-                    "current_value": userInfo.required_working_hours,
+                    "cur_val": userInfo.required_working_hours,
                     "label": "目標作業時間",
-                    "unit_before_value": "",
-                    "unit_after_value": "時間"
+                    "uni_before_val": "",
+                    "uni_after_val": "時間"
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback(
@@ -204,15 +210,16 @@ def get_user_info_setting_func(userInfo):
                 json.dumps({
                     "action": "display",
                     "type": "choices",
-                    "target_table": "user_info",
-                    "target_element": "starting_time_of_a_day",
-                    "tmp_value": userInfo.starting_time_of_a_day,
+                    "tar_tbl": "user_info",
+                    "tar_id": "",
+                    "tar_el": "starting_time_of_a_day",
+                    "tmp_val": userInfo.starting_time_of_a_day,
                     "min": 0,
                     "max": 23,
-                    "current_value": userInfo.starting_time_of_a_day,
+                    "cur_val": userInfo.starting_time_of_a_day,
                     "label": "1日のはじまりの時刻",
-                    "unit_before_value": "",
-                    "unit_after_value": "時"
+                    "uni_before_val": "",
+                    "uni_after_val": "時"
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback(
@@ -221,15 +228,16 @@ def get_user_info_setting_func(userInfo):
                 json.dumps({
                     "action": "display",
                     "type": "choices",
-                    "target_table": "user_info",
-                    "target_element": "the_last_stage",
-                    "tmp_value": userInfo.the_last_stage,
+                    "tar_tbl": "user_info",
+                    "tar_id": "",
+                    "tar_el": "the_last_stage",
+                    "tmp_val": userInfo.the_last_stage,
                     "min": 1,
                     "max": 100,
-                    "current_value": userInfo.the_last_stage,
+                    "cur_val": userInfo.the_last_stage,
                     "label": "最大の課題番号",
-                    "unit_before_value": "#",
-                    "unit_after_value": ""
+                    "uni_before_val": "#",
+                    "uni_after_val": ""
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback(
