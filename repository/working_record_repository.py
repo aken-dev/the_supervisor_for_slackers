@@ -1,4 +1,3 @@
-import datetime
 import traceback
 import common.db as db
 import common.constant as co
@@ -12,7 +11,10 @@ def a_working_record_select_by_id(id):
         result_count = cursor.execute(sql, (id))
         result = cursor.fetchone()
         connection.close()
-        return result_count, result
+        return {
+            "count": result_count,
+            "result": result
+        }
     except Exception as e:
         connection.close()
         print("Exception")
@@ -33,7 +35,10 @@ def a_working_record_select_by_user_id(
         result_count = cursor.execute(sql, (user_id, process_category, process_status, limit_value))
         result = cursor.fetchall()
         connection.close()
-        return result_count, result
+        return {
+            "count": result_count,
+            "result": result
+        }
     except Exception as e:
         connection.close()
         print("Exception")
@@ -66,7 +71,10 @@ def a_working_record_select_by_user_id_start_time_for_past(
             limit_value))
         result = cursor.fetchall()
         connection.close()
-        return result_count, result
+        return {
+            "count": result_count,
+            "result": result
+        }
     except Exception as e:
         connection.close()
         print("Exception")
@@ -99,7 +107,10 @@ def a_working_record_select_by_user_id_start_time_for_future(
             limit_value))
         result = cursor.fetchall()
         connection.close()
-        return result_count, result
+        return {
+            "count": result_count,
+            "result": result
+        }
     except Exception as e:
         connection.close()
         print("Exception")
@@ -189,7 +200,10 @@ def worked_minutes_on_process_select(user_id, start_time, finish_time):
             ))
         result = cursor.fetchone()
         connection.close()
-        return result_count, result
+        return {
+            "count": result_count,
+            "result": result
+        }
     except Exception as e:
         connection.close()
         print("Exception")
@@ -214,7 +228,10 @@ def worked_minutes_finished_select(user_id, start_time, finish_time):
                                             ))
         result = cursor.fetchone()
         connection.close()
-        return result_count, result
+        return {
+            "count": result_count,
+            "result": result
+        }
     except Exception as e:
         connection.close()
         print("Exception")

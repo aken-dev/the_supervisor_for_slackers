@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import datetime
-import math
 
 # LINEの日付文字列をDatetime型各種に変換
 def get_datetime_from_string(dt_str, type='datetime', format=None):
@@ -15,7 +14,8 @@ def get_datetime_from_string(dt_str, type='datetime', format=None):
     return None
 
 # Datetime型各種をLINEの日付文字列に変換
-def get_string_from_datetime(dt_instance=datetime.datetime.now(), type='datetime', format=None):
+def get_string_from_datetime(dt_instance=None, type='datetime', format=None):
+    if dt_instance == None: dt_instance = datetime.datetime.now()
     if type == 'dt_with_sec':
         return datetime.datetime.strftime(dt_instance, '%Y-%m-%dT%H:%M:%S' if format == None else format)
     elif type == 'datetime':
@@ -42,4 +42,7 @@ def get_users_time_range_of_the_day(
         return_datetime_start_of_the_day = sample_datetime.replace(hour=registered_users_time_a_day_starts, minute=0, second=0, microsecond=0) \
                      + datetime.timedelta(days=-1) 
         return_datetime_end_of_the_day = sample_datetime.replace(hour=registered_users_time_a_day_starts - 1, minute=59, second=59, microsecond=999999)
-    return return_datetime_start_of_the_day, return_datetime_end_of_the_day
+    return {
+        "datetime_start_of_the_day": return_datetime_start_of_the_day,
+        "datetime_end_of_the_day": return_datetime_end_of_the_day
+    }

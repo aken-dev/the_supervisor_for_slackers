@@ -15,19 +15,19 @@ def get_a_working_record_by_status(
         process_category=co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, 
         process_status=co.PROCESS_STATUS_ON_RECORDING, 
         limit_value=1
-    ):
-    result_count, result = wr_rp.a_working_record_select_by_user_id(
+):
+    record = wr_rp.a_working_record_select_by_user_id(
         userInfo.id, process_category, process_status, limit_value)
-    if result_count <= 0: return None
+    if record['count'] <= 0: return None
     workingRecord = WorkingRecord()
-    workingRecord.setEntityFromRecord(result[0])
+    workingRecord.setEntityFromRecord(record['result'][0])
     return workingRecord
 
 def get_a_working_record_by_record_id(id):
-    result_count, result = wr_rp.a_working_record_select_by_id(id)
-    if result_count <= 0: return None
+    record = wr_rp.a_working_record_select_by_id(id)
+    if record['count'] <= 0: return None
     workingRecord = WorkingRecord()
-    workingRecord.setEntityFromRecord(result)
+    workingRecord.setEntityFromRecord(record['result'])
     return workingRecord
 
 def start_the_work(userInfo, workingRecord=None):
@@ -87,27 +87,27 @@ def update_working_record(workingRecord, target_element_column, new_value):
     return workingRecord if result_count != 0 else None
 
 def display_working_history_main(userInfo, target_start_time=None):
-    result_count, result = wr_rp.a_working_record_select_by_user_id_start_time_for_past(
+    previous_records = wr_rp.a_working_record_select_by_user_id_start_time_for_past(
         userInfo.id, 
         target_start_time if target_start_time != None else datetime.datetime.now(),
         2,
     )
-    if result_count >= 1:
-        workingRecord = WorkingRecord()
-        workingRecord.setEntityFromRecord(result[0])
-        future_record_count_asc, future_records = wr_rp.a_working_record_select_by_user_id_start_time_for_future(
+    if previous_records['count'] >= 1:
+        previousWorkingRecord = WorkingRecord()
+        previousWorkingRecord.setEntityFromRecord(previous_records['result'][0])
+        future_records = wr_rp.a_working_record_select_by_user_id_start_time_for_future(
             userInfo.id, 
-            workingRecord.start_time,
+            previousWorkingRecord.start_time,
             2
         )
-        if future_record_count_asc >= 2:
+        if future_records['count'] >= 2:
             futureWorkingRecord = WorkingRecord()
-            futureWorkingRecord.setEntityFromRecord(future_records[1])
+            futureWorkingRecord.setEntityFromRecord(future_records['result'][1])
         return get_a_history(
             userInfo,
-            workingRecord,
-            None if future_record_count_asc < 2 else futureWorkingRecord.start_time,
-            None if result_count < 2 else workingRecord.start_time + datetime.timedelta(seconds=-1)
+            previousWorkingRecord,
+            None if future_records['count'] < 2 else futureWorkingRecord.start_time,
+            None if previous_records['count'] < 2 else previousWorkingRecord.start_time + datetime.timedelta(seconds=-1)
         )
     else: return lt_sv.get_a_text_send_message('記録が１件も無いぞ。')
         
@@ -163,15 +163,15 @@ def get_a_history(userInfo, workingRecord, future_start_time, previous_start_tim
                     "tar_el": "start_time",
                     "new_val": "datetime",
                     "label": "作業開始日時",
-                    "cur_val": dc_sv.get_string_from_datetime(workingRecord.start_time) if 
+                    "cur_val": dc_sv.get_string_from_datetime(workingRecord.start_time) if \
                     workingRecord.start_time != None else '',
                     "uni_before_val": "",
                     "uni_after_val": ""
                 }),
                 'datetime',
-                dc_sv.get_string_from_datetime(workingRecord.start_time) if 
-                workingRecord.start_time!= None else '',
-                dc_sv.get_string_from_datetime() if workingRecord.finish_time == None else 
+                dc_sv.get_string_from_datetime(workingRecord.start_time) if \
+                workingRecord.start_time!= None else dc_sv.get_string_from_datetime(),
+                dc_sv.get_string_from_datetime() if workingRecord.finish_time == None else \
                 dc_sv.get_string_from_datetime(workingRecord.finish_time)
             )
         ]       
@@ -193,71 +193,79 @@ def get_a_history(userInfo, workingRecord, future_start_time, previous_start_tim
                     "uni_after_val": ""
                 }),
                 'datetime',
-                dc_sv.get_string_from_datetime(workingRecord.finish_time) if 
-                workingRecord.finish_time!= None else '',
+                dc_sv.get_string_from_datetime(workingRecord.finish_time) if \
+                workingRecord.finish_time!= None else dc_sv.get_string_from_datetime(),
                 dc_sv.get_string_from_datetime(),
-                dc_sv.get_string_from_datetime(workingRecord.start_time) if 
+                dc_sv.get_string_from_datetime(workingRecord.start_time) if \
                 workingRecord.start_time!= None else ''
             )
         )
+    print(quick_reply_btns)
     return lt_sv.get_a_text_send_message_includes_quick_reply_buttons(
         '【作業履歴】\n\n' \
-        + '[課題番号]\n   #{}\n\n'.format(workingRecord.stage)
-        + '[作業開始]\n   {}\n\n'.format(workingRecord.start_time)
-        + '[作業終了]\n   {}\n\n'.format(workingRecord.finish_time if 
-                                        workingRecord.process_status == co.PROCESS_STATUS_RECORDED_SUCCESS else 
+        + '[課題番号]\n   #{}\n\n'.format(workingRecord.stage)\
+        + '[作業開始]\n   {}\n\n'.format(workingRecord.start_time)\
+        + '[作業終了]\n   {}\n\n'.format(workingRecord.finish_time if \
+                                        workingRecord.process_status == co.PROCESS_STATUS_RECORDED_SUCCESS else \
                                             '（作業中）'
-                                       )
-        + '{}'.format('' if workingRecord.memo_1 == None else '[メモ1]\n  {}\n'.format(workingRecord.memo_1))
-        + '{}'.format('' if workingRecord.memo_2 == None else '[メモ2]\n  {}\n'.format(workingRecord.memo_2))
+                                       )\
+        + '{}'.format('' if workingRecord.memo_1 == None else '[メモ1]\n  {}\n'.format(workingRecord.memo_1))\
+        + '{}'.format('' if workingRecord.memo_2 == None else '[メモ2]\n  {}\n'.format(workingRecord.memo_2))\
         + '{}'.format('' if workingRecord.memo_3 == None else '[メモ3]\n  {}\n'.format(workingRecord.memo_3)),
         quick_reply_btns
     )
 
-def display_highlight_main(userInfo, remind_flag=True):
-    worked_minutes, slacked_minutes = get_worked_minutes_total_int_and_slacked_minutes_int(userInfo)
+def display_highlight_main(userInfo):
+    worked_slacked_time = get_worked_minutes_total_int_and_slacked_minutes_int(userInfo)
     stage_on_process = get_stage_on_process(userInfo)
     allowed_slacking_minutes = get_allowed_slacking_minutes_a_day(userInfo)
     return lt_sv.get_a_text_send_message(
         '[今日の作業実績]\n'\
-        + '      {}時間{}分'.format(math.floor(worked_minutes / 60), worked_minutes % 60)\
-        + '  {}\n\n'.format('#{}を作業中'.fotmat(stage_on_process) if stage_on_process != None else '')\
+        + '      {}時間{}分\n'.format(
+            math.floor(worked_slacked_time['worked_minutes_total'] / 60),
+            worked_slacked_time['worked_minutes_total'] % 60)
+        + '      {}\n\n'.format(
+            '（#{}を作業中）'.format(stage_on_process) if stage_on_process != None else ''
+        )\
         + '[サボっていられる時間]\n'\
         + '      {}{}{}時間{}分'.format(
-            '（残り）' if allowed_slacking_minutes >= slacked_minutes else '（超過）',
-            '' if allowed_slacking_minutes >= slacked_minutes else '−',
-            math.floor(abs(allowed_slacking_minutes - slacked_minutes) / 60),
-            (abs(allowed_slacking_minutes - slacked_minutes) % 60),
+            '（残り）' if allowed_slacking_minutes >= worked_slacked_time['slacked_minutes'] else '（超過）',
+            '' if allowed_slacking_minutes >= worked_slacked_time['slacked_minutes'] else '−',
+            math.floor(abs(allowed_slacking_minutes - worked_slacked_time['slacked_minutes']) / 60),
+            (abs(allowed_slacking_minutes - worked_slacked_time['slacked_minutes']) % 60),
         )
     )
 
 def get_worked_minutes_total_int_and_slacked_minutes_int(userInfo):
-    datetime_start_of_the_day, datetime_end_of_the_day = dc_sv.get_users_time_range_of_the_day(
-        userInfo.starting_time_of_a_day)
+    users_time_range = dc_sv.get_users_time_range_of_the_day(userInfo.starting_time_of_a_day)
     worked_minutes_on_process = get_worked_minutes_on_process_int(
-        userInfo.id, datetime_start_of_the_day, datetime_end_of_the_day
+        userInfo.id, users_time_range['datetime_start_of_the_day'],
+        users_time_range['datetime_end_of_the_day']
     )
     worked_minutes_finished = get_worked_minutes_finished_int(
-        userInfo.id, datetime_start_of_the_day, datetime_end_of_the_day
+        userInfo.id, users_time_range['datetime_start_of_the_day'],
+        users_time_range['datetime_end_of_the_day']
     )
-    datetime_how_many_time_passed_today = datetime.datetime.now() - datetime_start_of_the_day
+    datetime_how_many_time_passed_today = datetime.datetime.now() \
+        - users_time_range['datetime_start_of_the_day']
     slacked_minutes = int(datetime_how_many_time_passed_today.seconds / 60) \
         - worked_minutes_on_process - worked_minutes_finished
-    return worked_minutes_on_process + worked_minutes_finished, slacked_minutes
+    return {
+        "worked_minutes_total": worked_minutes_on_process + worked_minutes_finished,
+        "slacked_minutes": slacked_minutes
+    }
 
 def get_worked_minutes_on_process_int(user_id, datetime_start_of_the_day, datetime_end_of_the_day):
-    worked_minutes_on_process_result_count, worked_minutes_on_process_result = \
-        wr_rp.worked_minutes_on_process_select(
+    worked_minutes_on_process = wr_rp.worked_minutes_on_process_select(
             user_id, datetime_start_of_the_day, datetime_end_of_the_day
-        )
-    return (worked_minutes_on_process_result['worked_minutes'] if worked_minutes_on_process_result['worked_minutes'] != None else 0)
+    )
+    return (worked_minutes_on_process['result']['worked_minutes'] if worked_minutes_on_process['result']['worked_minutes'] != None else 0)
 
 def get_worked_minutes_finished_int(user_id, datetime_start_of_the_day, datetime_end_of_the_day):
-    worked_minutes_finished_result_count, worked_minutes_finished_result = \
-        wr_rp.worked_minutes_finished_select(
+    worked_minutes_finished = wr_rp.worked_minutes_finished_select(
             user_id, datetime_start_of_the_day, datetime_end_of_the_day
-        )
-    return (worked_minutes_finished_result['worked_minutes'] if worked_minutes_finished_result['worked_minutes'] != None else 0)
+    )
+    return (worked_minutes_finished['result']['worked_minutes'] if worked_minutes_finished['result']['worked_minutes'] != None else 0)
 
 def get_stage_on_process(userInfo):
     workingRecord = get_a_working_record_by_status(userInfo)

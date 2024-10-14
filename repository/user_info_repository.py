@@ -10,7 +10,10 @@ def user_info_select(line_user_id):
         result_count = cursor.execute(sql, (line_user_id))
         result = cursor.fetchone()
         connection.close()
-        return result_count, result
+        return {
+            "count": result_count,
+            "result": result
+        }
     except Exception as e:
         connection.close()
         print("Exception")

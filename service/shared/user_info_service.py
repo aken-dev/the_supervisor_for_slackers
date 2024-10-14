@@ -10,8 +10,8 @@ from entity.user_info_entity import UserInfo
 
 # UserInfo
 def get_user_info(line_user_id, line_name):
-    result_count, result = ui_rp.user_info_select(line_user_id)
-    if result_count == 0:
+    record = ui_rp.user_info_select(line_user_id)
+    if record['count'] == 0:
         userInfo = add_new_user(line_user_id, line_name)
         if userInfo == None:
             print('新規ユーザレコード追加失敗 : {} : {}'.format(line_user_id, line_name))
@@ -20,7 +20,7 @@ def get_user_info(line_user_id, line_name):
             return userInfo
     else:
         userInfo = UserInfo()
-        userInfo.setEntityFromRecord(result)
+        userInfo.setEntityFromRecord(record['result'])
         return userInfo
 
 def add_new_user(line_user_id, line_name):

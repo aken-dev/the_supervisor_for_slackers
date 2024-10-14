@@ -77,7 +77,7 @@ def main(operating_mode, userInfo, postbacked_data):
                 "min": 1,
                 "max": 100,
                 "cur_val": "(未設定)",
-                "label": "間隔",
+                "label": "Remind",
                 "uni_before_val": "変更の",
                 "uni_after_val": "日後"
             }
