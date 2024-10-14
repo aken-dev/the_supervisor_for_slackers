@@ -149,8 +149,8 @@ def get_a_history(userInfo, workingRecord, future_start_time, previous_start_tim
                     "max": userInfo.the_last_stage,
                     "cur_val": workingRecord.stage,
                     "label": "課題番号",
-                    "uni_before_val": "#",
-                    "uni_after_val": ""
+                    "uni_before_val": "[ #",
+                    "uni_after_val": " ]"
                 })
             ),  
             lt_sv.get_quick_reply_button_for_postback_datetime( 
@@ -200,7 +200,6 @@ def get_a_history(userInfo, workingRecord, future_start_time, previous_start_tim
                 workingRecord.start_time!= None else ''
             )
         )
-    print(quick_reply_btns)
     return lt_sv.get_a_text_send_message_includes_quick_reply_buttons(
         '【作業履歴】\n\n' \
         + '[課題番号]\n   #{}\n\n'.format(workingRecord.stage)\
@@ -215,27 +214,58 @@ def get_a_history(userInfo, workingRecord, future_start_time, previous_start_tim
         quick_reply_btns
     )
 
-def display_highlight_main(userInfo):
+def display_highlight_main(userInfo, remind_flag=False):
     worked_slacked_time = get_worked_minutes_total_int_and_slacked_minutes_int(userInfo)
     stage_on_process = get_stage_on_process(userInfo)
     allowed_slacking_minutes = get_allowed_slacking_minutes_a_day(userInfo)
-    return lt_sv.get_a_text_send_message(
-        '[今日の作業実績]\n'\
-        + '      {}時間{}分\n'.format(
-            math.floor(worked_slacked_time['worked_minutes_total'] / 60),
-            worked_slacked_time['worked_minutes_total'] % 60)
-        + '      {}\n\n'.format(
-            '（#{}を作業中）'.format(stage_on_process) if stage_on_process != None else ''
-        )\
-        + '[サボっていられる時間]\n'\
-        + '      {}{}{}時間{}分'.format(
-            '（残り）' if allowed_slacking_minutes >= worked_slacked_time['slacked_minutes'] else '（超過）',
-            '' if allowed_slacking_minutes >= worked_slacked_time['slacked_minutes'] else '−',
-            math.floor(abs(allowed_slacking_minutes - worked_slacked_time['slacked_minutes']) / 60),
-            (abs(allowed_slacking_minutes - worked_slacked_time['slacked_minutes']) % 60),
+    msg_instance = [
+        lt_sv.get_a_text_send_message(
+            '[今日の作業実績]\n'\
+            + '      {}時間{}分\n'.format(
+                math.floor(worked_slacked_time['worked_minutes_total'] / 60),
+                worked_slacked_time['worked_minutes_total'] % 60)
+            + '      {}\n\n'.format(
+                '（#{}を作業中）'.format(stage_on_process) if stage_on_process != None else ''
+            )\
+            + '[サボっていられる時間]\n'\
+            + '      {}{}{}時間{}分'.format(
+                '（残り）' if allowed_slacking_minutes >= worked_slacked_time['slacked_minutes'] else '（超過）',
+                '' if allowed_slacking_minutes >= worked_slacked_time['slacked_minutes'] else '−',
+                math.floor(abs(allowed_slacking_minutes - worked_slacked_time['slacked_minutes']) / 60),
+                (abs(allowed_slacking_minutes - worked_slacked_time['slacked_minutes']) % 60),
+            )
         )
-    )
-
+    ]
+    if remind_flag:
+        msg_instance.append(
+            lt_sv.get_a_text_send_message_includes_quick_reply_buttons(
+                '【リマインド】\n' \
+                + '課題番号を [ #{} ]→[ #{} ]に変更する？'.format(
+                    userInfo.current_stage, userInfo.current_stage + 1
+                ),
+                lt_sv.get_quick_reply_button_for_postback(
+                    '[ #{} ]→[ #{} ]に変更する'.format(
+                        userInfo.current_stage, userInfo.current_stage + 1
+                    ), 
+                    '課題番号を [ #{} ]→[ #{} ]に変更する'.format(
+                        userInfo.current_stage, userInfo.current_stage + 1
+                    ), 
+                    json.dumps({
+                        "action": "update",
+                        "type": "",
+                        "tar_tbl": "user_info",
+                        "tar_id": "",
+                        "tar_el": "current_stage",
+                        "new_val": userInfo.current_stage + 1,
+                        "cur_val": userInfo.current_stage,
+                        "label": "課題番号",
+                        "uni_before_val": "[ #",
+                        "uni_after_val": " ]"
+                    })
+                )          
+            )
+        )
+    return msg_instance
 def get_worked_minutes_total_int_and_slacked_minutes_int(userInfo):
     users_time_range = dc_sv.get_users_time_range_of_the_day(userInfo.starting_time_of_a_day)
     worked_minutes_on_process = get_worked_minutes_on_process_int(
@@ -256,16 +286,18 @@ def get_worked_minutes_total_int_and_slacked_minutes_int(userInfo):
     }
 
 def get_worked_minutes_on_process_int(user_id, datetime_start_of_the_day, datetime_end_of_the_day):
-    worked_minutes_on_process = wr_rp.worked_minutes_on_process_select(
+    record_on_process = wr_rp.worked_minutes_on_process_select(
             user_id, datetime_start_of_the_day, datetime_end_of_the_day
     )
-    return (worked_minutes_on_process['result']['worked_minutes'] if worked_minutes_on_process['result']['worked_minutes'] != None else 0)
+    return record_on_process['result']['worked_minutes'] \
+        if record_on_process['result']['worked_minutes'] != None else 0
 
 def get_worked_minutes_finished_int(user_id, datetime_start_of_the_day, datetime_end_of_the_day):
-    worked_minutes_finished = wr_rp.worked_minutes_finished_select(
+    record_finished = wr_rp.worked_minutes_finished_select(
             user_id, datetime_start_of_the_day, datetime_end_of_the_day
     )
-    return (worked_minutes_finished['result']['worked_minutes'] if worked_minutes_finished['result']['worked_minutes'] != None else 0)
+    return record_finished['result']['worked_minutes'] \
+        if record_finished['result']['worked_minutes'] != None else 0
 
 def get_stage_on_process(userInfo):
     workingRecord = get_a_working_record_by_status(userInfo)

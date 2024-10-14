@@ -27,10 +27,8 @@ def get_string_from_datetime(dt_instance=None, type='datetime', format=None):
     return None
 
 # 引数で受け取ったdatetimeの値の日時が含まれる、ユーザーの1日のスタート日時とエンド日時を返却
-def get_users_time_range_of_the_day(
-        registered_users_time_a_day_starts=0, 
-        sample_datetime=datetime.datetime.now()
-    ):
+def get_users_time_range_of_the_day(registered_users_time_a_day_starts, sample_datetime=None):
+    if sample_datetime == None: sample_datetime = datetime.datetime.now()
     return_datetime_start_of_the_day: datetime
     return_datetime_end_of_the_day: datetime
     #ユーザー指定の時刻に達しているのなら

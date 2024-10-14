@@ -116,8 +116,8 @@ def get_user_info_setting_func(userInfo):
                     "max": userInfo.the_last_stage,
                     "cur_val": userInfo.current_stage,
                     "label": "現在の課題番号",
-                    "uni_before_val": "#",
-                    "uni_after_val": ""
+                    "uni_before_val": "[ #",
+                    "uni_after_val": " ]"
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback_datetime( 
@@ -238,8 +238,8 @@ def get_user_info_setting_func(userInfo):
                     "max": 100,
                     "cur_val": userInfo.the_last_stage,
                     "label": "最大の課題番号",
-                    "uni_before_val": "#",
-                    "uni_after_val": ""
+                    "uni_before_val": "[ #",
+                    "uni_after_val": " ]"
                 })
             ),
             lt_sv.get_quick_reply_button_for_postback(
@@ -254,3 +254,17 @@ def get_user_info_setting_func(userInfo):
         ]
     )
     
+def is_remind_needed(userInfo):
+    time_range = dc_sv.get_users_time_range_of_the_day(userInfo.starting_time_of_a_day)
+    if userInfo.stage_change_remind_type == co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK \
+        and userInfo.stage_change_remind_value == time_range['datetime_start_of_the_day'].date().weekday() \
+            and time_range['datetime_start_of_the_day'].date() != userInfo.recent_stage_changed_date:
+                return True
+    elif userInfo.stage_change_remind_type == co.STAGE_CHANGE_REMIND_TYPE_DAYS \
+        and userInfo.recent_stage_changed_date != None \
+            and userInfo.stage_change_remind_value >= 1 \
+                and userInfo.recent_stage_changed_date + datetime.timedelta(
+                    days=userInfo.stage_change_remind_value
+                ) <= time_range['datetime_start_of_the_day'].date():
+                    return True 
+    return False

@@ -1,24 +1,31 @@
 #!/usr/bin/env python3
 import common.constant as co
 import json
+import datetime
 import service.shared.line_tool_service as lt_sv
 import service.shared.user_info_service as ui_sv
 import service.shared.datetime_calc_service as dc_sv
 import service.shared.choice_maker_service as cm_sv
 
 def main(operating_mode, userInfo, postbacked_data):
-    # DBレコード更新処理
+    ## DBレコード更新処理
     userInfo = ui_sv.update_user_info(
         userInfo, 
         postbacked_data['tar_el'], 
         postbacked_data['new_val'] if postbacked_data['postbackedDateType'] == 'not_date' 
         else postbacked_data['postbackedDateValue']
     )
-    if userInfo == None:
-        return lt_sv.get_a_text_send_message('ユーザ情報の更新に失敗しました。')
+    if userInfo == None: return lt_sv.get_a_text_send_message('ユーザ情報の更新に失敗しました。')
+    # 課題番号を変更した場合は、直近の課題番号変更日も同時に更新する
+    if postbacked_data['tar_el'] == 'current_stage':
+        userInfo = ui_sv.update_user_info(
+            userInfo, 
+            'recent_stage_changed_date', 
+            datetime.date.today()
+        )
     ## 以下、返信テキストを作成する
     # リマインド種別を変更した場合
-    elif postbacked_data['tar_el'] == 'stage_change_remind_type':
+    if postbacked_data['tar_el'] == 'stage_change_remind_type':
         msg_instance = [
             lt_sv.get_a_text_send_message(
                 '[変更完了]\n'
@@ -76,8 +83,8 @@ def main(operating_mode, userInfo, postbacked_data):
                 "tmp_val": 5,
                 "min": 1,
                 "max": 100,
-                "cur_val": "(未設定)",
-                "label": "Remind",
+                "cur_val": "( )",
+                "label": "日数間隔",
                 "uni_before_val": "変更の",
                 "uni_after_val": "日後"
             }

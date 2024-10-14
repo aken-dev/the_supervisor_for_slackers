@@ -35,7 +35,7 @@ def get_standard_choices(postbacked_data, update_type=''):
         reply_buttons.append(
             lt_sv.get_quick_reply_button_for_postback(
                 '{} {} {}'.format(postbacked_data['uni_before_val'], i, postbacked_data['uni_after_val']), 
-                '{}を[ {} {} {} ] → [ {} {} {} ]に変更'.format(
+                '{}を {} {} {}  →  {} {} {} に変更'.format(
                     postbacked_data['label'], postbacked_data['uni_before_val'], postbacked_data['cur_val'], 
                     postbacked_data['uni_after_val'], postbacked_data['uni_before_val'], i, postbacked_data['uni_after_val']
                 ), 
@@ -51,7 +51,7 @@ def get_standard_choices(postbacked_data, update_type=''):
                     "uni_before_val": postbacked_data['uni_before_val'],
                     "uni_after_val": postbacked_data['uni_after_val']
                 })
-            )           
+            )
         )
     if choice_range_max < postbacked_data['max']:
         reply_buttons.append(
