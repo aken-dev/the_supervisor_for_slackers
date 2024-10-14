@@ -1,3 +1,4 @@
+import datetime
 import traceback
 import common.db as db
 import common.constant as co
@@ -164,6 +165,57 @@ def working_record_update(workingRecord, target_column):
         return result_count
     except Exception as e:
         connection.rollback()
+        connection.close()
+        print("Exception")
+        print(e, type(e))
+        print(traceback.format_exc())
+
+#作業中のレコードの作業時間（単位：分）を算出(集計用)
+def worked_minutes_on_process_select(user_id, start_time, finish_time):
+    try:
+        connection = db.connect()
+        cursor = connection.cursor()
+        sql = "SELECT FLOOR(SUM(TIMESTAMPDIFF(SECOND, `start_time`, NOW())) / 60) AS `worked_minutes` " \
+                + " FROM `working_record`" \
+                + " WHERE `user_id` =%s" \
+                + " AND `process_category` =%s" \
+                + " AND `process_status` =%s" \
+                + " AND `start_time` >=%s AND `start_time` <=%s"
+        result_count = cursor.execute(sql, (
+                user_id, 
+                co.PROCESS_CATEGORY_RECORD_WORKING_HOURS,
+                co.PROCESS_STATUS_ON_RECORDING,
+                start_time, finish_time
+            ))
+        result = cursor.fetchone()
+        connection.close()
+        return result_count, result
+    except Exception as e:
+        connection.close()
+        print("Exception")
+        print(e, type(e))
+        print(traceback.format_exc())
+
+#作業記録正常終了のレコードの作業時間（単位：分）を算出(集計用)
+def worked_minutes_finished_select(user_id, start_time, finish_time):
+    try:
+        connection = db.connect()
+        cursor = connection.cursor()
+        sql =  "SELECT FLOOR(SUM(TIMESTAMPDIFF(SECOND, `start_time`, `finish_time`)) / 60) AS `worked_minutes` " \
+                + " FROM `working_record`" \
+                + " WHERE `user_id` =%s" \
+                + " AND `process_category` =%s" \
+                + " AND `process_status` =%s" \
+                + " AND `start_time` >=%s AND `finish_time` <=%s"
+        result_count = cursor.execute(sql, (user_id, 
+                                            co.PROCESS_CATEGORY_RECORD_WORKING_HOURS,
+                                            co.PROCESS_STATUS_RECORDED_SUCCESS,
+                                            start_time, finish_time
+                                            ))
+        result = cursor.fetchone()
+        connection.close()
+        return result_count, result
+    except Exception as e:
         connection.close()
         print("Exception")
         print(e, type(e))

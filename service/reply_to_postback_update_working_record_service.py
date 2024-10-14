@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import common.constant as co
-import json
 import service.shared.working_record_service as wr_sv
 import service.shared.line_tool_service as lt_sv
 import service.shared.datetime_calc_service as dc_sv
