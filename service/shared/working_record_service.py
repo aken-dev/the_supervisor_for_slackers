@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import datetime
+import math
 import sys
 import json
 import common.constant as co
@@ -28,26 +29,6 @@ def get_a_working_record_by_record_id(id):
     workingRecord = WorkingRecord()
     workingRecord.setEntityFromRecord(result)
     return workingRecord
-
-# def add_new_working_record(userInfo):
-#     workingRecord = WorkingRecord(
-#         user_id = userInfo.id,
-#         line_user_id = userInfo.line_user_id,
-#         process_category = co.PROCESS_CATEGORY_RECORD_WORKING_HOURS,
-#         process_status = co.PROCESS_STATUS_NOT_STARTED,
-#         stage = userInfo.current_stage,
-#         registered_datetime = datetime.datetime.now(),
-#         registered_by = sys._getframe().f_code.co_name,
-#         updated_datetime = datetime.datetime.now(),
-#         updated_by = sys._getframe().f_code.co_name
-#     )
-#     if wr_rp.new_working_record_insert(workingRecord) <= 0: return None
-#     result_count, result = wr_rp.a_working_record_select_by_user_id(
-#         userInfo.id, co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, co.PROCESS_STATUS_NOT_STARTED
-#     )
-#     if result_count <= 0: return None
-#     workingRecord.setEntityFromRecord(result[0]) 
-#     return workingRecord
 
 def start_the_work(userInfo, workingRecord=None):
     if workingRecord == None:
@@ -232,7 +213,24 @@ def get_a_history(userInfo, workingRecord, future_start_time, previous_start_tim
         + '{}'.format('' if workingRecord.memo_3 == None else '[メモ3]\n  {}\n'.format(workingRecord.memo_3)),
         quick_reply_btns
     )
-    
+
+def display_highlight_main(userInfo, remind_flag=True):
+    worked_minutes, slacked_minutes = get_worked_minutes_total_int_and_slacked_minutes_int(userInfo)
+    stage_on_process = get_stage_on_process(userInfo)
+    allowed_slacking_minutes = get_allowed_slacking_minutes_a_day(userInfo)
+    return lt_sv.get_a_text_send_message(
+        '[今日の作業実績]\n'\
+        + '      {}時間{}分'.format(math.floor(worked_minutes / 60), worked_minutes % 60)\
+        + '  {}\n\n'.format('#{}を作業中'.fotmat(stage_on_process) if stage_on_process != None else '')\
+        + '[サボっていられる時間]\n'\
+        + '      {}{}{}時間{}分'.format(
+            '（残り）' if allowed_slacking_minutes >= slacked_minutes else '（超過）',
+            '' if allowed_slacking_minutes >= slacked_minutes else '−',
+            math.floor(abs(allowed_slacking_minutes - slacked_minutes) / 60),
+            (abs(allowed_slacking_minutes - slacked_minutes) % 60),
+        )
+    )
+
 def get_worked_minutes_total_int_and_slacked_minutes_int(userInfo):
     datetime_start_of_the_day, datetime_end_of_the_day = dc_sv.get_users_time_range_of_the_day(
         userInfo.starting_time_of_a_day)
@@ -252,18 +250,18 @@ def get_worked_minutes_on_process_int(user_id, datetime_start_of_the_day, dateti
         wr_rp.worked_minutes_on_process_select(
             user_id, datetime_start_of_the_day, datetime_end_of_the_day
         )
-    return (int(worked_minutes_on_process_result['worked_minutes']) if worked_minutes_on_process_result_count > 0 else 0)
+    return (worked_minutes_on_process_result['worked_minutes'] if worked_minutes_on_process_result['worked_minutes'] != None else 0)
 
 def get_worked_minutes_finished_int(user_id, datetime_start_of_the_day, datetime_end_of_the_day):
     worked_minutes_finished_result_count, worked_minutes_finished_result = \
         wr_rp.worked_minutes_finished_select(
             user_id, datetime_start_of_the_day, datetime_end_of_the_day
         )
-    return (int(worked_minutes_finished_result['worked_minutes']) if worked_minutes_finished_result_count > 0 else 0)
+    return (worked_minutes_finished_result['worked_minutes'] if worked_minutes_finished_result['worked_minutes'] != None else 0)
 
 def get_stage_on_process(userInfo):
     workingRecord = get_a_working_record_by_status(userInfo)
     return workingRecord.stage if workingRecord != None else None
 
-def get_minutes_slack_allowd_a_day(userInfo):
+def get_allowed_slacking_minutes_a_day(userInfo):
     return (24 - userInfo.required_working_hours) * 60

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import datetime
+import math
 
 # LINEの日付文字列をDatetime型各種に変換
 def get_datetime_from_string(dt_str, type='datetime', format=None):
