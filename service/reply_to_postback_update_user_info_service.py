@@ -8,21 +8,30 @@ import service.shared.datetime_calc_service as dc_sv
 import service.shared.choice_maker_service as cm_sv
 
 def main(operating_mode, userInfo, postbacked_data):
+    # 課題番号を変更する場合は、直近の課題番号変更日を同時に更新する
+    if postbacked_data['tar_el'] == 'current_stage':
+        me = ui_sv.update_user_info(
+            userInfo, 
+            'recent_stage_changed_date', 
+            datetime.date.today(),
+            userInfo.updated_datetime,
+            'update_user_info_tmp'
+        )
+        if me['count'] > 0: 
+            userInfo = me['userInfo']
+        else:    
+            return lt_sv.get_a_text_send_message('ユーザ情報の前更新に失敗しました。')
     ## DBレコード更新処理
-    userInfo = ui_sv.update_user_info(
+    me = ui_sv.update_user_info(
         userInfo, 
         postbacked_data['tar_el'], 
         postbacked_data['new_val'] if postbacked_data['postbackedDateType'] == 'not_date' 
         else postbacked_data['postbackedDateValue']
     )
-    if userInfo == None: return lt_sv.get_a_text_send_message('ユーザ情報の更新に失敗しました。')
-    # 課題番号を変更した場合は、直近の課題番号変更日も同時に更新する
-    if postbacked_data['tar_el'] == 'current_stage':
-        userInfo = ui_sv.update_user_info(
-            userInfo, 
-            'recent_stage_changed_date', 
-            datetime.date.today()
-        )
+    if me['count'] > 0:
+        userInfo = me['userInfo']
+    else: 
+        return lt_sv.get_a_text_send_message('ユーザ情報の更新に失敗しました。')
     ## 以下、返信テキストを作成する
     # リマインド種別を変更した場合
     if postbacked_data['tar_el'] == 'stage_change_remind_type':
@@ -49,11 +58,10 @@ def main(operating_mode, userInfo, postbacked_data):
         if postbacked_data['new_val'] == co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK:
             quick_reply_btns = []
             for i in range(0, 6 + 1):
-                day_label = co.WEEKDAY[i]
                 quick_reply_btns.append(
                     lt_sv.get_quick_reply_button_for_postback(
-                        '{}'.format(day_label), 
-                        '（毎週）{}にリマインド'.format(day_label), 
+                        '{}'.format(co.WEEKDAY[i]), 
+                        '（毎週）{}にリマインド'.format(co.WEEKDAY[i]), 
                         json.dumps({
                             "action": "update",
                             "type": "",
@@ -62,7 +70,7 @@ def main(operating_mode, userInfo, postbacked_data):
                             "tar_el": "stage_change_remind_value",
                             "new_val": i,
                             "cur_val": '',
-                            "label": '（毎週）{}にリマインド'.format(day_label),
+                            "label": '（毎週）{}にリマインド'.format(co.WEEKDAY[i]),
                             "uni_before_val": "",
                             "uni_after_val": ""
                         })
@@ -92,11 +100,11 @@ def main(operating_mode, userInfo, postbacked_data):
         return msg_instance
     # リマインドする曜日を変更した場合
     elif userInfo.stage_change_remind_type == co.STAGE_CHANGE_REMIND_TYPE_DAY_OF_WEEK \
-    and postbacked_data['tar_el'] == 'stage_change_remind_value':
-        return lt_sv.get_a_text_send_message(
-            '[変更完了]\n'
-            + '    → {}'.format(postbacked_data['label'])
-        )
+        and postbacked_data['tar_el'] == 'stage_change_remind_value':
+            return lt_sv.get_a_text_send_message(
+                '[変更完了]\n'
+                + '    → {}'.format(postbacked_data['label'])
+            )
     # datetime関連のパラメータ変更の場合
     elif postbacked_data['postbackedDateType'] != 'not_date':
         return lt_sv.get_a_text_send_message(

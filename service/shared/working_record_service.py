@@ -18,17 +18,33 @@ def get_a_working_record_by_status(
 ):
     record = wr_rp.a_working_record_select_by_user_id(
         userInfo.id, process_category, process_status, limit_value)
-    if record['count'] <= 0: return None
-    workingRecord = WorkingRecord()
-    workingRecord.setEntityFromRecord(record['result'][0])
-    return workingRecord
+    if record['count'] > 0:
+        workingRecord = WorkingRecord()
+        workingRecord.setEntityFromRecord(record['result'][0])
+        return {
+            "workingRecord": workingRecord,
+            "count": record['count']
+        }
+    else:
+        return {
+            "workingRecord": None,
+            "count": record['count']
+        } 
 
 def get_a_working_record_by_record_id(id):
     record = wr_rp.a_working_record_select_by_id(id)
-    if record['count'] <= 0: return None
-    workingRecord = WorkingRecord()
-    workingRecord.setEntityFromRecord(record['result'])
-    return workingRecord
+    if record['count'] > 0:
+        workingRecord = WorkingRecord()
+        workingRecord.setEntityFromRecord(record['result'])
+        return {
+            "workingRecord": workingRecord,
+            "count": record['count']
+        }
+    else:
+        return {
+            "workingRecord": None,
+            "count": record['count']
+        } 
 
 def start_the_work(userInfo, workingRecord=None):
     if workingRecord == None:
@@ -44,7 +60,11 @@ def start_the_work(userInfo, workingRecord=None):
             updated_datetime = datetime.datetime.now(),
             updated_by = sys._getframe().f_code.co_name
         )
-        return workingRecord if wr_rp.new_working_record_insert(workingRecord) > 0 else None
+        result_count = wr_rp.new_working_record_insert(workingRecord)
+        return {
+            "workingRecord": workingRecord,
+            "count": result_count
+        }
     else:
         if workingRecord.process_category != co.PROCESS_CATEGORY_RECORD_WORKING_HOURS \
             or workingRecord.process_status != co.PROCESS_STATUS_NOT_STARTED \
@@ -55,36 +75,60 @@ def start_the_work(userInfo, workingRecord=None):
         else workingRecord.start_time
         workingRecord.updated_datetime = datetime.datetime.now()
         workingRecord.updated_by = sys._getframe().f_code.co_name
-        return workingRecord if wr_rp.working_record_status_update(workingRecord) > 0 else None
+        result_count = wr_rp.working_record_status_update(workingRecord)
+        return {
+            "workingRecord": workingRecord,
+            "count": result_count
+        }
 
 def finish_the_work(userInfo, workingRecord=None):
     if workingRecord == None:
-        workingRecord = get_a_working_record_by_status(
+        record = get_a_working_record_by_status(
             userInfo, co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, co.PROCESS_STATUS_ON_RECORDING
         )
-    if workingRecord == None \
-        or workingRecord.process_category != co.PROCESS_CATEGORY_RECORD_WORKING_HOURS \
+        if record['count'] > 0:
+            workingRecord = record['workingRecord']
+        else:
+            print('更新対象レコードの取得に失敗:finish_the_work, user:{}'.format(userInfo.id))
+            return {
+                "workingRecord": None,
+                "count": record['count']
+            }
+    if workingRecord.process_category != co.PROCESS_CATEGORY_RECORD_WORKING_HOURS \
         or workingRecord.process_status != co.PROCESS_STATUS_ON_RECORDING \
         or workingRecord.standby_status != co.STANDBY_STATUS_READY:
-        return None
+            print('更新対象レコードが適正ではない:finish_the_work, user:{}'.format(userInfo.id))
+            return {
+                "workingRecord": None,
+                "count": None
+            }
     workingRecord.process_status = co.PROCESS_STATUS_RECORDED_SUCCESS
     workingRecord.finish_time = datetime.datetime.now() if workingRecord.finish_time == None \
     else workingRecord.finish_time
     workingRecord.updated_datetime = datetime.datetime.now()
     workingRecord.updated_by = sys._getframe().f_code.co_name
-    return workingRecord if wr_rp.working_record_status_update(workingRecord) > 0 else None
+    result_count = wr_rp.working_record_status_update(workingRecord)
+    return {
+        "workingRecord": workingRecord,
+        "count": result_count
+    }
 
-def update_working_record(workingRecord, target_element_column, new_value):
+def update_working_record(workingRecord, target_element_column, new_value, updated_at= None, updated_by=None):
+    if updated_at == None: updated_at = datetime.datetime.now()
+    if updated_by == None: updated_by = sys._getframe().f_code.co_name
     exec('workingRecord.{} = {}{}{}'.format(
         target_element_column,
         '' if type(new_value) == 'number' else '"',
         new_value,
         '' if type(new_value) == 'number' else '"'        
     ))
-    workingRecord.updated_datetime = datetime.datetime.now(),
-    workingRecord.updated_by = sys._getframe().f_code.co_name
+    workingRecord.updated_datetime = updated_at
+    workingRecord.updated_by = updated_by
     result_count = wr_rp.working_record_update(workingRecord, target_element_column)
-    return workingRecord if result_count != 0 else None
+    return {
+        "workingRecord": workingRecord,
+        "count": result_count
+    }
 
 def display_working_history_main(userInfo, target_start_time=None):
     previous_records = wr_rp.a_working_record_select_by_user_id_start_time_for_past(
@@ -115,8 +159,8 @@ def get_a_history(userInfo, workingRecord, future_start_time, previous_start_tim
     quick_reply_btns = []
     if previous_start_time != None:
         quick_reply_btns.append(lt_sv.get_quick_reply_button_for_postback(
-            '1つ前を表示', 
-            '1つ前の履歴を表示', 
+            '1つ過去の記録を表示', 
+            '1つ過去の記録履歴を表示', 
             json.dumps({
                 "action": "display",
                 "type": "working_history",
@@ -125,8 +169,8 @@ def get_a_history(userInfo, workingRecord, future_start_time, previous_start_tim
         ))
     if future_start_time != None:
         quick_reply_btns.append(lt_sv.get_quick_reply_button_for_postback(
-            '1つ後を表示', 
-            '1つ後の履歴を表示', 
+            '1つ未来の記録を表示', 
+            '1つ未来の記録を表示', 
             json.dumps({
                 "action": "display",
                 "type": "working_history",
@@ -266,6 +310,7 @@ def display_highlight_main(userInfo, remind_flag=False):
             )
         )
     return msg_instance
+
 def get_worked_minutes_total_int_and_slacked_minutes_int(userInfo):
     users_time_range = dc_sv.get_users_time_range_of_the_day(userInfo.starting_time_of_a_day)
     worked_minutes_on_process = get_worked_minutes_on_process_int(
@@ -300,8 +345,11 @@ def get_worked_minutes_finished_int(user_id, datetime_start_of_the_day, datetime
         if record_finished['result']['worked_minutes'] != None else 0
 
 def get_stage_on_process(userInfo):
-    workingRecord = get_a_working_record_by_status(userInfo)
-    return workingRecord.stage if workingRecord != None else None
+    record_on_process = get_a_working_record_by_status(userInfo)
+    if record_on_process['count'] > 0:
+        return record_on_process['workingRecord'].stage
+    else:
+        return None
 
 def get_allowed_slacking_minutes_a_day(userInfo):
     return (24 - userInfo.required_working_hours) * 60

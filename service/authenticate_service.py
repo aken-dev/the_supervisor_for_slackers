@@ -7,7 +7,8 @@ import service.shared.user_info_service as ui_sv
 
 # Authentication
 def main(operating_mode, line_user_id, line_name, postback_data=None):
-    userInfo = ui_sv.get_user_info(line_user_id, line_name)
+    me = ui_sv.get_user_info(line_user_id, line_name)
+    userInfo = me['userInfo']
     if userInfo == None:
         print('Cannot get UserInfo : {} : {}'.format(line_user_id, line_name))
         return {
@@ -42,12 +43,18 @@ def main(operating_mode, line_user_id, line_name, postback_data=None):
                 new_user_flag = True 
             else:
                 new_user_flag = False
-            userInfo = ui_sv.change_user_allowed(userInfo, co.USER_ALLOWED)
             print('規約同意：{} : {}'.format(line_user_id, line_name))
-            return {
-                "userInfo": userInfo,
-                "msg": ui_sv.display_user_info_main(userInfo, new_user_flag)
-            }
+            me = ui_sv.change_user_allowed(userInfo, co.USER_ALLOWED)
+            if me['count'] > 0:
+                return {
+                    "userInfo": me['userInfo'],
+                    "msg": ui_sv.display_user_info_main(me['userInfo'], new_user_flag)
+                }
+            else:    
+                return {
+                    "userInfo": userInfo,
+                    "msg": lt_sv.get_a_text_send_message('ユーザ情報の更新に失敗しました。暫く経ってから再度お試しください。')
+                }                
         elif postback_data['action'] == 'agreement' and postback_data['value'] == 'disagree':
             print('規約不同意：{} : {}'.format(line_user_id, line_name))
             return {

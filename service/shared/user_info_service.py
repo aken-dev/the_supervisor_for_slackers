@@ -10,18 +10,27 @@ from entity.user_info_entity import UserInfo
 
 # UserInfo
 def get_user_info(line_user_id, line_name):
-    record = ui_rp.user_info_select(line_user_id)
-    if record['count'] == 0:
-        userInfo = add_new_user(line_user_id, line_name)
-        if userInfo == None:
+    selected_user = ui_rp.user_info_select(line_user_id)
+    if selected_user['count'] == 0:
+        added_new_user = add_new_user(line_user_id, line_name)
+        if added_new_user['count'] == 0:
             print('新規ユーザレコード追加失敗 : {} : {}'.format(line_user_id, line_name))
-            return None
+            return {
+                "userInfo": None,
+                "count": added_new_user['count']
+            }
         else:
-            return userInfo
+            return {
+                "userInfo": added_new_user['userInfo'],
+                "count": added_new_user['count']
+            }
     else:
         userInfo = UserInfo()
-        userInfo.setEntityFromRecord(record['result'])
-        return userInfo
+        userInfo.setEntityFromRecord(selected_user['result'])
+        return {
+            "userInfo": userInfo,
+            "count": selected_user['count']
+        }
 
 def add_new_user(line_user_id, line_name):
     userInfo = UserInfo(
@@ -34,26 +43,37 @@ def add_new_user(line_user_id, line_name):
         updated_by = sys._getframe().f_code.co_name
     )
     result_count = ui_rp.userinfo_new_user_insert(userInfo)
-    return userInfo if result_count != 0 else None
+    return {
+        "userInfo": userInfo,
+        "count": result_count
+    }
 
 def change_user_allowed(userInfo, new_allowed):
     userInfo.allowed = new_allowed
     userInfo.updated_datetime = datetime.datetime.now(),
     userInfo.updated_by = sys._getframe().f_code.co_name
     result_count = ui_rp.userinfo_update(userInfo, 'allowed')
-    return userInfo if result_count != 0 else None
+    return {
+        "userInfo": userInfo,
+        "count": result_count
+    }
 
-def update_user_info(userInfo, target_element_column, new_value):
+def update_user_info(userInfo, target_element_column, new_value, updated_at= None, updated_by=None):
+    if updated_at == None: updated_at = datetime.datetime.now()
+    if updated_by == None: updated_by = sys._getframe().f_code.co_name
     exec('userInfo.{} = {}{}{}'.format(
         target_element_column,
         '' if type(new_value) == 'number' else '"',
         new_value,
         '' if type(new_value) == 'number' else '"'        
     ))
-    userInfo.updated_datetime = datetime.datetime.now(),
-    userInfo.updated_by = sys._getframe().f_code.co_name
+    userInfo.updated_datetime = updated_at
+    userInfo.updated_by = updated_by
     result_count = ui_rp.userinfo_update(userInfo, target_element_column)
-    return userInfo if result_count != 0 else None
+    return {
+        "userInfo": userInfo,
+        "count": result_count
+    }
 
 def display_user_info_main(userInfo, new_user_flag=False):
     msg_instances = []
