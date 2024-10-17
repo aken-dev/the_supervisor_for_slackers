@@ -21,6 +21,19 @@ def main(operating_mode, userInfo, postbacked_data):
             userInfo = me['userInfo']
         else:    
             return lt_sv.get_a_text_send_message('ユーザ情報の前更新に失敗しました。')
+    # 日付起算時刻を変更する場合は、WorkingRecord適正化バッチの適用を予約する
+    elif postbacked_data['tar_el'] == 'starting_time_of_a_day':
+        me = ui_sv.update_user_info(
+            userInfo, 
+            'standby_status', 
+            co.STANDBY_STATUS_WAITING_BATCH_PROCESS_RECALCULATE,
+            userInfo.updated_datetime,
+            'update_user_info_tmp'
+        )
+        if me['count'] > 0: 
+            userInfo = me['userInfo']
+        else:    
+            return lt_sv.get_a_text_send_message('ユーザ情報の前更新に失敗しました。')        
     ## DBレコード更新処理
     me = ui_sv.update_user_info(
         userInfo, 

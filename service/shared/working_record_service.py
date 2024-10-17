@@ -97,7 +97,7 @@ def finish_the_work(userInfo, workingRecord=None):
     if workingRecord.process_category != co.PROCESS_CATEGORY_RECORD_WORKING_HOURS \
         or workingRecord.process_status != co.PROCESS_STATUS_ON_RECORDING \
         or workingRecord.standby_status != co.STANDBY_STATUS_READY:
-            print('更新対象レコードが適正ではない:finish_the_work, user:{}'.format(userInfo.id))
+            print('更新対象レコードの状態が適正ではない:finish_the_work, user:{}'.format(userInfo.id))
             return {
                 "workingRecord": None,
                 "count": None
