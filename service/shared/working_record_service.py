@@ -314,15 +314,15 @@ def display_highlight_main(userInfo, remind_flag=False):
 def get_worked_minutes_total_int_and_slacked_minutes_int(userInfo):
     users_time_range = dc_sv.get_users_time_range_of_the_day(userInfo.starting_time_of_a_day)
     worked_minutes_on_process = get_worked_minutes_on_process_int(
-        userInfo.id, users_time_range['datetime_start_of_the_day'],
-        users_time_range['datetime_end_of_the_day']
+        userInfo.id, users_time_range['start_of_the_day'],
+        users_time_range['end_of_the_day']
     )
     worked_minutes_finished = get_worked_minutes_finished_int(
-        userInfo.id, users_time_range['datetime_start_of_the_day'],
-        users_time_range['datetime_end_of_the_day']
+        userInfo.id, users_time_range['start_of_the_day'],
+        users_time_range['end_of_the_day']
     )
     datetime_how_many_time_passed_today = datetime.datetime.now() \
-        - users_time_range['datetime_start_of_the_day']
+        - users_time_range['start_of_the_day']
     slacked_minutes = int(datetime_how_many_time_passed_today.seconds / 60) \
         - worked_minutes_on_process - worked_minutes_finished
     return {
@@ -330,16 +330,16 @@ def get_worked_minutes_total_int_and_slacked_minutes_int(userInfo):
         "slacked_minutes": slacked_minutes
     }
 
-def get_worked_minutes_on_process_int(user_id, datetime_start_of_the_day, datetime_end_of_the_day):
+def get_worked_minutes_on_process_int(user_id, start_of_the_day, end_of_the_day):
     record_on_process = wr_rp.worked_minutes_on_process_select(
-            user_id, datetime_start_of_the_day, datetime_end_of_the_day
+            user_id, start_of_the_day, end_of_the_day
     )
     return record_on_process['result']['worked_minutes'] \
         if record_on_process['result']['worked_minutes'] != None else 0
 
-def get_worked_minutes_finished_int(user_id, datetime_start_of_the_day, datetime_end_of_the_day):
+def get_worked_minutes_finished_int(user_id, start_of_the_day, end_of_the_day):
     record_finished = wr_rp.worked_minutes_finished_select(
-            user_id, datetime_start_of_the_day, datetime_end_of_the_day
+            user_id, start_of_the_day, end_of_the_day
     )
     return record_finished['result']['worked_minutes'] \
         if record_finished['result']['worked_minutes'] != None else 0

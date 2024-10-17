@@ -28,19 +28,22 @@ def get_string_from_datetime(dt_instance=None, type='datetime', format=None):
 
 # 引数で受け取ったdatetimeの値の日時が含まれる、ユーザーの1日のスタート日時とエンド日時を返却
 def get_users_time_range_of_the_day(registered_users_time_a_day_starts, sample_datetime=None):
-    if sample_datetime == None: sample_datetime = datetime.datetime.now()
-    return_datetime_start_of_the_day: datetime
-    return_datetime_end_of_the_day: datetime
+    if sample_datetime == None: 
+        sample_datetime = datetime.datetime.now()
+    start_of_the_day: datetime
+    end_of_the_day: datetime
     #ユーザー指定の時刻に達しているのなら
     if sample_datetime.hour >= registered_users_time_a_day_starts:
-        return_datetime_start_of_the_day = sample_datetime.replace(hour=registered_users_time_a_day_starts, minute=0, second=0, microsecond=0)
-        return_datetime_end_of_the_day = return_datetime_start_of_the_day + datetime.timedelta(days=1) + datetime.timedelta(microseconds=-1)
+        start_of_the_day = sample_datetime.replace(hour=registered_users_time_a_day_starts, minute=0, second=0, microsecond=0)
+        end_of_the_day = start_of_the_day + datetime.timedelta(days=1) + datetime.timedelta(microseconds=-1)
     #ユーザー指定の時刻に達していないなら
     else:
-        return_datetime_start_of_the_day = sample_datetime.replace(hour=registered_users_time_a_day_starts, minute=0, second=0, microsecond=0) \
-                     + datetime.timedelta(days=-1) 
-        return_datetime_end_of_the_day = sample_datetime.replace(hour=registered_users_time_a_day_starts - 1, minute=59, second=59, microsecond=999999)
+        start_of_the_day = sample_datetime.replace(
+            hour=registered_users_time_a_day_starts, minute=0, second=0, microsecond=0) \
+            + datetime.timedelta(days=-1) 
+        end_of_the_day = sample_datetime.replace(
+            hour=registered_users_time_a_day_starts - 1, minute=59, second=59, microsecond=999999)
     return {
-        "datetime_start_of_the_day": return_datetime_start_of_the_day,
-        "datetime_end_of_the_day": return_datetime_end_of_the_day
+        "start_of_the_day": start_of_the_day,
+        "end_of_the_day": end_of_the_day
     }
