@@ -169,8 +169,8 @@ def get_a_history(userInfo, workingRecord, future_start_time, previous_start_tim
         ))
     if future_start_time != None:
         quick_reply_btns.append(lt_sv.get_quick_reply_button_for_postback(
-            '1つ未来の記録を表示', 
-            '1つ未来の記録を表示', 
+            '1つ新しいの記録を表示', 
+            '1つ新しいの記録を表示', 
             json.dumps({
                 "action": "display",
                 "type": "working_history",

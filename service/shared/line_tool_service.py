@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import json
 from linebot.models import PostbackAction, QuickReplyButton, MessageAction, QuickReply, TextSendMessage
-import service.shared.datetime_calc_service as datetime_calc_sv
+import service.shared.datetime_calc_service as dc_sv
 
 #シンプルなテキストメッセージを作成
 def get_a_text_send_message(text):
@@ -47,13 +47,13 @@ def get_postbacked_data(event):
     if ('params' in str(event.postback)):
         if('date' in event.postback.params):
             data['postbackedDateType'] = 'date'
-            data['postbackedDateValue'] = datetime_calc_sv.get_datetime_from_string(event.postback.params['date'], 'date')
+            data['postbackedDateValue'] = dc_sv.get_datetime_from_string(event.postback.params['date'], 'date')
         elif('time' in event.postback.params):
             data['postbackedDateType'] = 'time'
-            data['postbackedDateValue'] = datetime_calc_sv.get_datetime_from_string(event.postback.params['time'], 'time')
+            data['postbackedDateValue'] = dc_sv.get_datetime_from_string(event.postback.params['time'], 'time')
         elif('datetime' in event.postback.params):
             data['postbackedDateType'] = 'datetime'
-            data['postbackedDateValue'] = datetime_calc_sv.get_datetime_from_string(event.postback.params['datetime'])
+            data['postbackedDateValue'] = dc_sv.get_datetime_from_string(event.postback.params['datetime'])
     else:
         data['postbackedDateType'] = 'not_date'
     return data

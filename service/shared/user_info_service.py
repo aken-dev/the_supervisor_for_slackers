@@ -77,7 +77,7 @@ def update_user_info(userInfo, target_element_column, new_value, updated_at= Non
 
 def display_user_info_main(userInfo, new_user_flag=False):
     msg_instances = []
-    if new_user_flag == True:
+    if new_user_flag:
         msg_instances.append(lt_sv.get_a_text_send_message(
             '君は怠惰で有名な{}だろ！？\n待ってたぞ。\nまずは質より量だ。はやく作業に取り掛るんだ！'
             .format(userInfo.line_name)
