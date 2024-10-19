@@ -22,4 +22,4 @@ CREATE TABLE `user_info` (
   `memo_3` varchar(200) DEFAULT NULL COMMENT 'メモ3',
   `standby_status` int(11) NOT NULL DEFAULT 0 COMMENT '待機状態（0=準備完了，1=バッチ処理中，2=バッチ再計算処理待ち，3=バッチ異常終了）',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='ユーザ情報';
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='ユーザ情報';

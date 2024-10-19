@@ -122,17 +122,17 @@ def new_working_record_insert(workingRecord):
         connection = db.connect()
         cursor = connection.cursor()
         sql = "INSERT INTO `working_record` " \
-        + "(`user_id`, `line_user_id`, `process_category`, " \
-        + "`process_status`, `stage`, "  \
-        + "`start_time`, `finish_time`, " \
-        + " `registered_datetime`, `registered_by`, " \
-        + "`updated_datetime`, `updated_by`)" \
-        + " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        result_count = cursor.execute(sql, (workingRecord.user_id, workingRecord.line_user_id, workingRecord.process_category,
-                                            workingRecord.process_status, workingRecord.stage, 
-                                            workingRecord.start_time, workingRecord.finish_time,
-                                            workingRecord.registered_datetime, workingRecord.registered_by, 
-                                            workingRecord.updated_datetime, workingRecord.updated_by))
+              + "(`user_id`, `line_user_id`, `process_category`, " \
+              + "`process_status`, `stage`, `start_time`, "  \
+              + "`finish_time`, `registered_datetime`, `registered_by`, " \
+              + "`updated_datetime`, `updated_by`)" \
+              + " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        result_count = cursor.execute(sql, (
+            workingRecord.user_id, workingRecord.line_user_id, workingRecord.process_category,
+            workingRecord.process_status, workingRecord.stage, workingRecord.start_time, 
+            workingRecord.finish_time, workingRecord.registered_datetime, workingRecord.registered_by, 
+            workingRecord.updated_datetime, workingRecord.updated_by
+        ))
         connection.commit()
         connection.close()
         return result_count

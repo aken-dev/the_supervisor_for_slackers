@@ -21,6 +21,12 @@ def main(operating_mode, line_user_id, line_name, postback_data=None):
             "userInfo": userInfo,
             "msg": lt_sv.get_a_text_send_message('只今メンテナンス中です。しばらくしてから再度お試しください。')
         }
+    elif userInfo.standby_status == co.STATUS_BATCH_PROCESSED_FAILURE:
+        print('UserInfo(バッチ異常終了)のアクセス : {} : {}'.format(line_user_id, line_name))
+        return {
+            "userInfo": userInfo,
+            "msg": lt_sv.get_a_text_send_message('ユーザ情報データに異常があります。管理者までお問い合わせください。')
+        }
     elif userInfo.allowed == co.USER_ALLOWED:
         return {
             "userInfo": userInfo,
