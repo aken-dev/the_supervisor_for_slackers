@@ -353,3 +353,12 @@ def get_stage_on_process(userInfo):
 
 def get_allowed_slacking_minutes_a_day(userInfo):
     return (24 - userInfo.required_working_hours) * 60
+
+def reserve_batch_recalculate(userInfo):
+    wr_rp.working_record_standby_status_update(
+        userInfo.id,
+        co.STANDBY_STATUS_WAITING_BATCH_PROCESS_RECALCULATE,
+        co.STANDBY_STATUS_READY,
+        datetime.datetime.now(),
+        sys._getframe().f_code.co_name
+    )

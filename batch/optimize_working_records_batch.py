@@ -125,7 +125,7 @@ def recalculate_working_record(
                 targetsNextDayWorkingRecord.start_time = target_time_range['start_of_the_day']\
                     + datetime.timedelta(days=1)
                 targetsNextDayWorkingRecord.finish_time = None
-                targetsNextDayWorkingRecord.standby_status = co.STANDBY_STATUS_READY
+                targetsNextDayWorkingRecord.standby_status = co.STANDBY_STATUS_WAITING_BATCH_PROCESS_RECALCULATE
                 targetsNextDayWorkingRecord.registered_datetime = datetime.datetime.now()
                 targetsNextDayWorkingRecord.registered_by = 'recalculate_working_record_batch'
                 targetsNextDayWorkingRecord.updated_datetime = datetime.datetime.now()
@@ -167,7 +167,7 @@ def recalculate_working_record(
                 targetsNextDayWorkingRecord.setEntityFromRecord(target_record)
                 targetsNextDayWorkingRecord.start_time = target_time_ramge_made_from_start_time['start_of_the_day'] \
                     + datetime.timedelta(days=1)
-                targetsNextDayWorkingRecord.standby_status = co.STANDBY_STATUS_READY
+                targetsNextDayWorkingRecord.standby_status = co.STANDBY_STATUS_WAITING_BATCH_PROCESS_RECALCULATE
                 targetsNextDayWorkingRecord.registered_datetime = datetime.datetime.now()
                 targetsNextDayWorkingRecord.registered_by = 'recalculate_working_record_batch'
                 targetsNextDayWorkingRecord.updated_datetime = datetime.datetime.now()

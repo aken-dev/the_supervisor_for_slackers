@@ -237,3 +237,27 @@ def worked_minutes_finished_select(user_id, start_time, finish_time):
         print("Exception")
         print(e, type(e))
         print(traceback.format_exc())
+
+def working_record_standby_status_update(
+    user_id, new_standby_status, standby_status, updated_at, updated_by
+):
+    try:
+        connection = db.connect()
+        cursor = connection.cursor()
+        sql = "UPDATE `working_record` SET `standby_status`=%s, `updated_datetime`=%s, `updated_by`=%s "\
+              + "WHERE `user_id`=%s AND `process_category`=%s AND `process_status`=%s AND `standby_status`=%s "\
+              + "OR `user_id`=%s AND `process_category`=%s AND `process_status`=%s AND `standby_status`=%s "
+        result_count = cursor.execute(sql, (
+            new_standby_status, updated_at, updated_by, 
+            user_id, co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, co.PROCESS_STATUS_ON_RECORDING, standby_status,
+            user_id, co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, co.PROCESS_STATUS_RECORDED_SUCCESS, standby_status          
+        ))
+        connection.commit()
+        connection.close()
+        return result_count
+    except Exception as e:
+        connection.rollback()
+        connection.close()
+        print("Exception")
+        print(e, type(e))
+        print(traceback.format_exc())
