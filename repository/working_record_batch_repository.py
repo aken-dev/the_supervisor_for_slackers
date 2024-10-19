@@ -105,3 +105,32 @@ def over_time_working_record_insert(connection, workingRecord):
         print("Exception")
         print(e, type(e))
         print(traceback.format_exc())
+
+def working_record_standby_status_reserve_update(
+    connection, starting_time_of_a_day, target_start_time, updated_at, updated_by
+):
+    try:
+        cursor = connection.cursor()
+        sql = "UPDATE working_record AS wr "\
+              + "INNER JOIN user_info AS ui ON wr.user_id = ui.id "\
+              + "SET wr.standby_status=%s, wr.updated_datetime=%s, wr.updated_by=%s "\
+              + "WHERE wr.process_category=%s AND wr.process_status=%s "\
+              + "AND wr.start_time>=%s AND wr.standby_status=%s "\
+              + "AND ui.starting_time_of_a_day=%s "\
+              + "OR wr.process_category=%s AND wr.process_status=%s "\
+              + "AND wr.start_time>=%s AND wr.standby_status=%s "\
+              + "AND ui.starting_time_of_a_day=%s "
+        result_count = cursor.execute(sql, (
+            co.STANDBY_STATUS_WAITING_BATCH_PROCESS_RECALCULATE, updated_at, updated_by,
+            co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, co.PROCESS_STATUS_ON_RECORDING,
+            target_start_time, co.STANDBY_STATUS_READY,
+            starting_time_of_a_day,
+            co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, co.PROCESS_STATUS_RECORDED_SUCCESS,
+            target_start_time, co.STANDBY_STATUS_READY,
+            starting_time_of_a_day
+        ))
+        return result_count
+    except Exception as e:
+        print("Exception")
+        print(e, type(e))
+        print(traceback.format_exc())
