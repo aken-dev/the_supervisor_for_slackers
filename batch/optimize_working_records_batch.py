@@ -57,8 +57,8 @@ def recalculate_user_info(connection, user_info_records_limit, working_records_l
             co.STANDBY_STATUS_READY if is_completed else co.STANDBY_STATUS_WAITING_BATCH_PROCESS_RECALCULATE, 
             datetime.datetime.now(), 
             'recalculate_user_info_batch'
-    )
-    connection.commit()
+        )
+        connection.commit()
 
 def recalculate_working_record(
     connection, user_id, registered_users_time_a_day_starts, working_records_limit
@@ -73,7 +73,7 @@ def recalculate_working_record(
     for target_record in target_records['result']:
         status_change_result_count += wr_bt_rp.working_record_standby_status_update(
             connection,
-            target_records['result']['id'],
+            target_record['id'],
             co.STANDBY_STATUS_ON_BATCH_PROCESS,
             datetime.datetime.now(), 
             'recalculate_working_record_batch'
@@ -84,7 +84,7 @@ def recalculate_working_record(
         print('更新したレコード数:{}').format(status_change_result_count)
         print('【WorkingRecords】\n{}').format(target_records)
         connection.rollback()
-        raise Exception('WorkingRecord:status_change_Err(waiting→on_batch)')
+        raise Exception()
     connection.commit()
     for target_record in target_records['result']:
         targetWorkingRecord = WorkingRecord()
@@ -105,25 +105,25 @@ def recalculate_working_record(
                 registered_users_time_a_day_starts
             )
             # target_recordのstart_timeが今日のstart_timeよりも過去の場合:
-            if target_time_range['start_of_the_day'] > todays_time_range['start_of_the_day']:
+            if target_time_range['start_of_the_day'] < todays_time_range['start_of_the_day']:
                 # target_recordをfinish_timeを設定した上で記録正常終了で更新する。
                 targetWorkingRecord.process_status = co.PROCESS_STATUS_RECORDED_SUCCESS
                 targetWorkingRecord.finish_time = target_time_range['end_of_the_day'] 
                 targetWorkingRecord.updated_datetime = datetime.datetime.now()
                 targetWorkingRecord.updated_by = 'recalculate_working_record_batch'
-                target_update_cnt = wr_bt_rp.working_record_batch_update(connection, WorkingRecord)
+                target_update_cnt = wr_bt_rp.working_record_batch_update(connection, targetWorkingRecord)
                 if target_update_cnt < 1:
                     print('【working_record_batch_update_Err(ON_RECORDING→RECORDED_SUCCESS)】')
-                    print('更新対象レコード数:{}').format(1)
-                    print('更新したレコード数:{}').format(target_update_cnt)
-                    print('更新対象レコードid:{}').format(WorkingRecord.id)
+                    print('更新対象レコード数:{}'.format(1))
+                    print('更新したレコード数:{}'.format(target_update_cnt))
+                    print('更新対象レコードid:{}'.format(WorkingRecord.id))
                     connection.rollback()
-                    raise Exception('working_record_batch_update_Err(ON_RECORDING→RECORDED_SUCCESS)')
+                    raise Exception()
                 # target_recordのstart_timeをそのtimerengeのstart_time+1日で設定した新レコードを生成する
                 targetsNextDayWorkingRecord = WorkingRecord()
                 targetsNextDayWorkingRecord.setEntityFromRecord(target_record)
-                targetsNextDayWorkingRecord.start_time = target_time_range['start_of_the_day']
-                + datetime.timedelta(days=1)
+                targetsNextDayWorkingRecord.start_time = target_time_range['start_of_the_day']\
+                    + datetime.timedelta(days=1)
                 targetsNextDayWorkingRecord.finish_time = None
                 targetsNextDayWorkingRecord.standby_status = co.STANDBY_STATUS_READY
                 targetsNextDayWorkingRecord.registered_datetime = datetime.datetime.now()
@@ -135,11 +135,11 @@ def recalculate_working_record(
                 )
                 if targets_next_day_insert_cnt < 1:
                     print('【over_time_working_record_insert_Err】')
-                    print('挿入レコード数:{}').format(1)
-                    print('挿入したレコード数:{}').format(targets_next_day_insert_cnt)
-                    print('レコード元id:{}').format(targetWorkingRecord.id)
+                    print('挿入レコード数:{}'.format(1))
+                    print('挿入したレコード数:{}'.format(targets_next_day_insert_cnt))
+                    print('レコード元id:{}'.format(targetWorkingRecord.id))
                     connection.rollback()
-                    raise Exception('over_time_working_record_insert_Err')
+                    raise Exception()
         # target_recordのステータスが記録正常終了
         # かつ、target_recordのstart_timeから算出したtime_rangeの開始日時よりも
         # target_recordのfinish_timeから算出したtime_rangeの開始日時が過去の場合、
@@ -155,18 +155,18 @@ def recalculate_working_record(
                 targetWorkingRecord.finish_time = target_time_ramge_made_from_start_time['end_of_the_day']
                 targetWorkingRecord.updated_datetime = datetime.datetime.now()
                 targetWorkingRecord.updated_by = 'recalculate_working_record_batch'
-                target_update_cnt = wr_bt_rp.working_record_batch_update(connection, WorkingRecord)
+                target_update_cnt = wr_bt_rp.working_record_batch_update(connection, targetWorkingRecord)
                 if target_update_cnt < 1:
                     print('【working_record_batch_update_Err(finish_time更新)】')
-                    print('更新対象レコード数:{}').format(1)
-                    print('更新したレコード数:{}').format(target_update_cnt)
-                    print('更新対象レコードid:{}').format(targetWorkingRecord.id)
+                    print('更新対象レコード数:{}'.format(1))
+                    print('更新したレコード数:{}'.format(target_update_cnt))
+                    print('更新対象レコードid:{}'.format(targetWorkingRecord.id))
                     connection.rollback()
-                    raise Exception('【working_record_batch_update_Err(finish_time更新)】')
+                    raise Exception()
                 targetsNextDayWorkingRecord = WorkingRecord()
                 targetsNextDayWorkingRecord.setEntityFromRecord(target_record)
-                targetsNextDayWorkingRecord.start_time = target_time_ramge_made_from_start_time['start_of_the_day']
-                + datetime.timedelta(days=1)
+                targetsNextDayWorkingRecord.start_time = target_time_ramge_made_from_start_time['start_of_the_day'] \
+                    + datetime.timedelta(days=1)
                 targetsNextDayWorkingRecord.standby_status = co.STANDBY_STATUS_READY
                 targetsNextDayWorkingRecord.registered_datetime = datetime.datetime.now()
                 targetsNextDayWorkingRecord.registered_by = 'recalculate_working_record_batch'
@@ -176,32 +176,32 @@ def recalculate_working_record(
                     connection, targetsNextDayWorkingRecord
                 )
                 if targets_next_day_insert_cnt < 1:
+                    print('ここまできたよー')
                     print('【over_time_working_record_insert_Err】')
-                    print('挿入レコード数:{}').format(1)
-                    print('挿入したレコード数:{}').format(targets_next_day_insert_cnt)
-                    print('レコード元id:{}').format(targetWorkingRecord.id)
+                    print('挿入レコード数:{}'.format(1))
+                    print('挿入したレコード数:{}'.format(targets_next_day_insert_cnt))
+                    print('レコード元id:{}'.format(targetWorkingRecord.id))
                     connection.rollback()
-                    raise Exception('over_time_working_record_insert_Err')
+                    raise Exception()
     status_change_result_count = 0
     for target_record in target_records['result']:
         status_change_result_count += wr_bt_rp.working_record_standby_status_update(
             connection,
-            target_records['result']['id'],
+            target_record['id'],
             co.STANDBY_STATUS_READY,
             datetime.datetime.now(), 
             'recalculate_working_record_batch'
         )
     if target_records['count'] != status_change_result_count: 
         print('【WorkingRecord:status_change_Err(on_batch→ready)】')
-        print('ステータス更新対象レコード数:{}').format(target_records['count'])
-        print('更新したレコード数:{}').format(status_change_result_count)
-        print('【WorkingRecords】\n{}').format(target_records)
+        print('ステータス更新対象レコード数:{}'.format(target_records['count']))
+        print('更新したレコード数:{}'.format(status_change_result_count))
+        print('【WorkingRecords】\n{}'.format(target_records))
         connection.rollback()
-        raise Exception('WorkingRecord:status_change_Err(on_batch→ready)')
-    connection.commit()
+        raise Exception()
     records_cnt_of_standby_statuys_waiting = wr_bt_rp.count_select_by_standby_status(
         connection,
         user_id, 
         co.STANDBY_STATUS_WAITING_BATCH_PROCESS_RECALCULATE
     )
-    return records_cnt_of_standby_statuys_waiting['result'] == 0
+    return records_cnt_of_standby_statuys_waiting['result']['count'] == 0

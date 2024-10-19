@@ -33,7 +33,7 @@ def working_records_select_by_standby_status(connection, user_id, standby_status
 def count_select_by_standby_status(connection, user_id, standby_status):
     try:
         cursor = connection.cursor()
-        sql = "SELECT COUNT(*) AS 'cnt' FROM `working_record` "\
+        sql = "SELECT COUNT(*) AS 'count' FROM `working_record` "\
               + "WHERE `user_id`=%s AND `process_category`=%s AND `process_status`=%s AND `standby_status`=%s "\
               + "OR `user_id`=%s AND `process_category`=%s AND `process_status`=%s AND `standby_status`=%s "
         result_count = cursor.execute(sql, (
@@ -85,7 +85,6 @@ def working_record_batch_update(connection, workingRecord):
 
 def over_time_working_record_insert(connection, workingRecord):
     try:
-        connection = db.connect()
         cursor = connection.cursor()
         sql = "INSERT INTO `working_record` " \
               + "(`user_id`, `line_user_id`, `process_category`, " \
