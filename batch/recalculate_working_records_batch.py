@@ -38,6 +38,7 @@ def recalculate_user_info(connection, user_info_records_limit, working_records_l
         co.STANDBY_STATUS_WAITING_BATCH_PROCESS_RECALCULATE,
         user_info_records_limit
     )
+    print(datetime.datetime.now())
     for target_user in target_users['result']:
         ui_bt_rp.userinfo_standby_status_update(
             connection, 

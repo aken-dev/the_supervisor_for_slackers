@@ -19,8 +19,10 @@ def run():
     try:
         connection = db.connect()
         result_count = mark_reserve_recalculate_working_record(connection, working_records_reserve_days_limit)
+        print(datetime.datetime.now())
         if result_count > 0: print('WorkingRecord再計算予約レコード数:{}'.format(result_count))
         result_count = mark_reserve_recalculate_user_info(connection)
+        print(datetime.datetime.now())
         if result_count > 0: print('UserInfo再計算予約レコード数:{}'.format(result_count))
         connection.close()
 

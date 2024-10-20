@@ -29,6 +29,7 @@ def run():
         result_count = mark_defected_user_info(
             connection, waiting_recalc_timeout_minutes, batch_process_timeout_minutes
         )
+        print(datetime.datetime.now())
         if result_count > 0: print('UserInfoタイムアウトレコード数:{}'.format(result_count))
         connection.close()
 
