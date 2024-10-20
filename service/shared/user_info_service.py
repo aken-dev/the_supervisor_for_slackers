@@ -37,6 +37,7 @@ def add_new_user(line_user_id, line_name):
         line_user_id = line_user_id,
         line_name = line_name,
         allowed = co.USER_UNREGISTERED,
+        recent_stage_changed_date = datetime.date.today(),
         registered_datetime = datetime.datetime.now(),
         registered_by = sys._getframe().f_code.co_name,
         updated_datetime = datetime.datetime.now(),

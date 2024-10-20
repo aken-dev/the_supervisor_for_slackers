@@ -25,11 +25,13 @@ def userinfo_new_user_insert(userInfo):
         connection = db.connect()
         cursor = connection.cursor()
         sql = "INSERT INTO `user_info` "  \
-        + "(`line_user_id`, `line_name`, `allowed`,"  \
+        + "(`line_user_id`, `line_name`,"  \
+        + " `allowed`, `recent_stage_changed_date`," \
         + " `registered_datetime`, `registered_by`," \
         + " `updated_datetime`, `updated_by`)" \
-        + " VALUES (%s, %s, %s, %s, %s, %s, %s)"
-        result_count = cursor.execute(sql, (userInfo.line_user_id, userInfo.line_name, userInfo.allowed,
+        + " VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        result_count = cursor.execute(sql, (userInfo.line_user_id, userInfo.line_name,
+                                            userInfo.allowed, userInfo.recent_stage_changed_date,
                                             userInfo.registered_datetime, userInfo.registered_by, 
                                             userInfo.updated_datetime, userInfo.updated_by))
         connection.commit()
