@@ -3,6 +3,8 @@ import traceback
 import common.constant as co
 import batch.recalculate_working_records_batch as recalculate_working_records_batch
 import batch.reserve_for_recalculation_batch as reserve_for_recalculation_batch
+import batch.find_defected_user_info_records_batch as find_defected_user_info_records_batch
+import batch.find_defected_working_records_batch as find_defected_working_records_batch
 from dotenv import load_dotenv
 load_dotenv()
 try:
@@ -19,9 +21,9 @@ try:
         elif batch_type == co.BATCH_TYPE_EXECUTE_RECALCULATION:
             recalculate_working_records_batch.run()
         elif batch_type == co.BATCH_TYPE_FIND_DEFECTED_USER_INFO_RECORDS_AND_MARK_STATUS_FAILURE:
-            0
+            find_defected_user_info_records_batch.run()
         elif batch_type == co.BATCH_TYPE_FIND_DEFECTED_WORKING_RECORDS_AND_MARK_STATUS_FAILURE:
-            0
+            find_defected_working_records_batch.run()
     
 except KeyboardInterrupt:
     print('Ctrl+Cで終了')

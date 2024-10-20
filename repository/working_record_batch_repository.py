@@ -134,3 +134,46 @@ def working_record_standby_status_reserve_update(
         print("Exception")
         print(e, type(e))
         print(traceback.format_exc())
+        
+def working_record_find_and_mark_defected_records_update(
+    connection, waiting_batch_recalc_timeout_datetime, 
+    on_batch_process_timeout_datetime, updated_at, updated_by
+):
+    try:
+        cursor = connection.cursor()
+        sql = "UPDATE `working_record` SET `standby_status` =%s,`updated_datetime` =%s, `updated_by` =%s "\
+              + "WHERE `standby_status` =%s AND `updated_datetime` <%s"\
+              + "OR `standby_status` =%s AND `updated_datetime` <%s"
+        result_count = cursor.execute(sql, (
+            co.STANDBY_STATUS_BATCH_PROCESSED_FAILURE, updated_at, updated_by,
+            co.STANDBY_STATUS_WAITING_BATCH_PROCESS_RECALCULATE, waiting_batch_recalc_timeout_datetime,
+            co.STANDBY_STATUS_ON_BATCH_PROCESS, on_batch_process_timeout_datetime
+        ))
+        return result_count
+    except Exception as e:
+        print("Exception")
+        print(e, type(e))
+        print(traceback.format_exc())
+        
+def working_record_find_and_mark_recorded_failure_records_update(
+    connection, updated_at, updated_by
+):
+    try:
+        cursor = connection.cursor()
+        sql = "UPDATE `working_record` SET `process_status` =%s,`updated_datetime` =%s, `updated_by` =%s "\
+              + "WHERE `process_category` =%s AND `process_status` =%s AND `start_time` IS NULL "\
+              + "OR `process_category` =%s AND `process_status` =%s AND `start_time` IS NULL "\
+              + "OR `process_category` =%s AND `process_status` =%s AND `finish_time` IS NULL "\
+              + "OR `process_category` =%s AND `process_status` =%s AND `start_time` > `finish_time` "
+        result_count = cursor.execute(sql, (
+            co.PROCESS_STATUS_RECORDED_FAILURE, updated_at, updated_by,
+            co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, co.PROCESS_STATUS_ON_RECORDING,
+            co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, co.PROCESS_STATUS_RECORDED_SUCCESS,
+            co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, co.PROCESS_STATUS_RECORDED_SUCCESS,
+            co.PROCESS_CATEGORY_RECORD_WORKING_HOURS, co.PROCESS_STATUS_RECORDED_SUCCESS
+        ))
+        return result_count
+    except Exception as e:
+        print("Exception")
+        print(e, type(e))
+        print(traceback.format_exc())
