@@ -21,7 +21,9 @@ def main(operating_mode, userInfo, postbacked_data):
         else postbacked_data['postbackedDateValue']
     )
     if updated['count'] <= 0:
-        return lt_sv.get_a_text_send_message('更新対象レコードの更新に失敗しました。')
+        print('【working_record更新失敗】')
+        print('postbacked_data={}'.format(postbacked_data))
+        return lt_sv.get_a_text_send_message('しばらく経ってから再度お試しください。')
     else:
         workingRecord = updated['workingRecord']
         # 変更する要素がstart_timeかfinish_timeの場合、再計算バッチを予約する
@@ -35,7 +37,8 @@ def main(operating_mode, userInfo, postbacked_data):
             'update_working_record_from_postback'
             )
             if reserve_recalc_wr_result['count'] <= 0:
-                return lt_sv.get_a_text_send_message('workingRecordの再計算予約に失敗しました。')
+                print('working_recordの再計算予約失敗.id={}'.format(workingRecord.id))
+                return lt_sv.get_a_text_send_message('情報の更新が不完全です。システム管理者に連絡してください。')
             else:
                 # user_infoの再計算予約
                 reserve_recalc_ui_result = ui_sv.update_user_info(
@@ -46,7 +49,8 @@ def main(operating_mode, userInfo, postbacked_data):
                     'update_working_record_from_postback'
                 )
                 if reserve_recalc_ui_result['count'] <= 0:
-                    return lt_sv.get_a_text_send_message('userInfoの再計算予約に失敗しました。')
+                    print('user_infoの再計算予約失敗.id={}'.format(userInfo.id))
+                    return lt_sv.get_a_text_send_message('情報の更新が不完全です。システム管理者に連絡してください。')
                 
     ## 以下、返信テキストを作成する
     return lt_sv.get_a_text_send_message(
