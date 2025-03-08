@@ -33,8 +33,6 @@ Python 3.9.16
 
 Flask 2.3.2
 
-Werkzeug 2.3.4
-
 uwsgi 2.0.21
 
 aws: EC2, Route 53, VPC, ACM, ELB ALB, Amazon RDS(MariaDB)
