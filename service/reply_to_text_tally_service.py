@@ -2,4 +2,5 @@
 import service.shared.line_tool_service as lt_sv
 
 def main(operating_mode, userInfo, recieved_text):
+    //集計機能は共通メソッドから呼び出す
     return lt_sv.get_a_text_send_message('集計機能はまだ開発中です')
